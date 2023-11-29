@@ -23,9 +23,8 @@ Future<void> main() async {
         theme: ThemeData(
           // colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3:false,
-
         ),
-        home:  NewPatient(),
+        home:  HomePage(),
       ))
   );
 }

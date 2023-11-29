@@ -1,9 +1,12 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/material.dart';
 import 'package:jonk_lab/New%20Sample%20Path/address_autofill.dart';
 import 'package:jonk_lab/New%20Sample%20Path/all_rider_view.dart';
 import 'package:record/record.dart';
+import 'package:audioplayers/audioplayers.dart' as audio;
+import '../Services/Push_notifsctio_apicalling.dart';
 
 
 class NewPatient extends StatefulWidget {
@@ -47,7 +50,7 @@ class _NewPatientState extends State<NewPatient> {
   }
 
 
-  Future<void>stopRecording()async{
+  Future<void>stopRecording() async{
     try{
       String? path=await audioRecord.stop();
       setState(() {
@@ -56,7 +59,6 @@ class _NewPatientState extends State<NewPatient> {
       });
      // await uploadAudioToFirebaseStorage();
     }
-
     catch(e){
       print(e);
     }
@@ -64,7 +66,7 @@ class _NewPatientState extends State<NewPatient> {
 
   Future<void>playRecording()async{
     try{
-      Source urlSource=UrlSource(audioPath);
+      audio.Source urlSource=UrlSource(audioPath);
       await audioPlayer.play(urlSource);
     }
     catch(e){
@@ -74,8 +76,9 @@ class _NewPatientState extends State<NewPatient> {
 
 
 
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     var height = MediaQuery.of(context).size.height; //834
     var width = MediaQuery.of(context).size.width; //392
     return ColorfulSafeArea(
@@ -170,7 +173,8 @@ class _NewPatientState extends State<NewPatient> {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.only(left: 10),
-                        child: TextField(
+                        child: TextField (
+
                           cursorColor: Colors.black,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
@@ -218,8 +222,9 @@ class _NewPatientState extends State<NewPatient> {
                               border: InputBorder.none,
                               hintText: "Patient age",
                               hintStyle: TextStyle(
-                                  fontSize: width * 3.9 / 100,
-                                  color: Color(0xFFC0C0C0))),
+                              fontSize: width * 3.9 / 100,
+                              color: Color(0xFFC0C0C0))
+                          ),
                         ),
                       ),
                     )
@@ -246,6 +251,7 @@ class _NewPatientState extends State<NewPatient> {
                         )
                       ],
                     ),
+
                     Container(
                       height: height * 7 / 100,
                       decoration: BoxDecoration(
@@ -308,6 +314,7 @@ class _NewPatientState extends State<NewPatient> {
                       ),
                     )
                   ],
+
                 ),
               ),
               Container(
@@ -407,8 +414,8 @@ class _NewPatientState extends State<NewPatient> {
                                 style: ElevatedButton.styleFrom(
                                   primary: Colors.grey, // Set the background color
                                 ),
-                                onPressed:playRecording ,
-                                child: Icon(Icons.speaker_phone)
+                                onPressed:playRecording,
+                                child:Icon(Icons.speaker_phone)
                             )
                         ],
                       ),
@@ -424,6 +431,7 @@ class _NewPatientState extends State<NewPatient> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+
                   Container(
                     height: 50,
                     width: 200,
@@ -434,16 +442,27 @@ class _NewPatientState extends State<NewPatient> {
                             ),
                             backgroundColor: Color(0xFF111111),
                             elevation: 10,
-                            shadowColor: Colors.black),
-                        onPressed:(){
-                         Navigator.push(context, MaterialPageRoute(builder: (context) => MapView(),));
+                            shadowColor: Colors.black
+                        ),
+                        onPressed:() async {
+                         List<String> dataList = ["dACjQ0PhQmigI91FrhU5aI:APA91bEh57mIgrnr6mDTylBimvBvRnD-6YPVBRu38YCAph51b4N8HsuS94QK3KFnx2Od0vcKLV_j0_35pVFEPlu5aIW51ls87qPULtG7qm1SP8JHSEYIQBYvhus00Glal1tBgc2g1UbX"];
+                         //  var user = await FirebaseFirestore.instance.collection("users").get();
+                         // var fcmTokens = user.docs.map((docValue) => UserModel.fromJson(docValue.data())).toList();
+                         //  for (var element in fcmTokens) {
+                         //    dataList.add(element.fcmToken);
+                         //  }
+
+                          PushNotification().sendNotification(
+                              "New patient ", "hey Amit where are you", "", dataList);
+                         Navigator.push(context, MaterialPageRoute(builder: (context) => MapView(patientLocation:NewPatient.location),));
                         },
                         child: Text(
                           "ʙᴏᴏᴋ ʀɪᴅᴇʀ",
                           style: TextStyle(
                             fontSize: 20,
                           ),
-                        )),
+                        )
+                    ),
                   ),
                 ],
               )
@@ -455,3 +474,4 @@ class _NewPatientState extends State<NewPatient> {
   }
 }
 
+//AAAAa7EVXgo:APA91bHqWt8YtjjEdktLMKf33oI0jWRebAERJIeuDeIUtmwzpZLEjs_TFTDglQF0x2_YV8ja-bDQpN0NcH1RTrf-LKSCUX0Zmxbf3Ufnkrw6FyHo_segLClJsQ0sU98Kf3cElnegg4B1

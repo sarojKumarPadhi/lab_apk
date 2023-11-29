@@ -6,9 +6,11 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:ui' as ui;
 
-import 'package:lottie/lottie.dart';
 
 class MapView extends StatefulWidget {
+  var patientLocation;
+
+  MapView( {Key? key, required this.patientLocation}) : super(key: key);
   @override
   _MapViewState createState() => _MapViewState();
 }
@@ -22,6 +24,7 @@ class _MapViewState extends State<MapView> {
       data.buffer.asUint8List(),
       targetWidth: width,
     );
+
     ui.FrameInfo fi = await codec.getNextFrame();
     return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
   }
@@ -41,7 +44,7 @@ class _MapViewState extends State<MapView> {
     LatLng(30.6544, 76.8791),
     LatLng(30.6747, 76.8634),
     LatLng(30.6899, 76.8484),
-    LatLng(30.6927, 76.8796),
+    LatLng(30.6927,  76.8796),
     LatLng(30.6927, 76.8796),
   ];
 
@@ -52,25 +55,36 @@ class _MapViewState extends State<MapView> {
     findRider();
   }
 
-  findRider() {
+   findRider() {
     Future.delayed(Duration.zero, () {
+
       showModalBottomSheet<void>(
         isDismissible: false,
         context: context,
-        builder: (BuildContext context) {
+        builder: (BuildContext context){
           return SizedBox(
-            height: 300,
+            height: 200,
             child: Center(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment. end,
                 children: <Widget>[
                   Column(
-                    children: [
-                      Text("First Text"),
-                      Lottie.asset('assets/animation.json'), // Update the path to the Lottie animation
-                      Divider(),
-                      Text("Second Text"),
+                    children:[
+                      Row(
+                        children:[
+                          Image.asset("assets/images/patient.png",width: 50,height: 50,),
+                          Text(widget.patientLocation.toString()),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20,right: 20,bottom: 10),
+                        child: LinearProgressIndicator(),
+                      ),
+
+                      Text("Searching for rider..."),
+                      SizedBox(height: 30,),
+                      Icon(Icons.cancel,size: 40,),
+                      SizedBox(height: 10,)
                     ],
                   )
                 ],
@@ -79,7 +93,8 @@ class _MapViewState extends State<MapView> {
           );
         },
       );
-    });
+    }
+    );
   }
 
   loadData() async {
@@ -115,3 +130,7 @@ class _MapViewState extends State<MapView> {
     );
   }
 }
+
+
+
+
