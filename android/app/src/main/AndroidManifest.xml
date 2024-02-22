@@ -1,9 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
-        android:label="jonk_lab"
+        android:label="Jonk Lab"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -34,7 +35,10 @@
             android:value="2" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyC9MdSwH2nJXBCIIhE7Acvqu2ez8yJf_YY"/>
+            android:value="AIzaSyBYS7le5kBhTFk65Xk3ouaBbFlNbgUhONw"/>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="high_importance_channel" />
 
     </application>
 </manifest>

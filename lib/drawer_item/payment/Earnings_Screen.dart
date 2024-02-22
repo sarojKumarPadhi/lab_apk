@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:jonk_lab/drawer_item/payment/payment_details.dart';
+import 'package:jonk_lab/global/color.dart';
+import 'package:jonk_lab/global/globalData.dart';
 import '../../Global/date_picker.dart';
 
 class EarningsScreen extends StatefulWidget {
@@ -12,42 +14,47 @@ class _EarningsScreenState extends State<EarningsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ColorfulSafeArea(
-        color: Colors.white,
-        child: DefaultTabController(
-          length: 2,
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                child: TabBar(
-                  tabs: [
-                    Tab(text: 'Today'),
-                    Tab(text: 'History'),
-                  ],
-                  unselectedLabelColor: Colors.blue,
-                  labelColor: Colors.white,
-                  indicator: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  labelStyle: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.9,
-                  ),
+      appBar: AppBar(
+        backgroundColor: primaryColor,
+      ),
+      body: DefaultTabController(
+        length: 2,
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+              child: TabBar(
+
+                tabs: [
+                  SizedBox(
+                     width: deviceWidth!*.5,
+                      child: const Tab(text: 'Today')),
+                  SizedBox(
+                      width: deviceWidth!*.3,
+                      child: const Tab(text: 'History')),
+                ],
+                unselectedLabelColor: Colors.blue,
+                labelColor: Colors.white,
+                indicator: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: BorderRadius.circular(deviceWidth!*.01),
+                ),
+                labelStyle: const TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.9,
                 ),
               ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    EarningsTab(title: 'Today', earningsData: todayEarningsData),
-                    EarningsTab(title: 'History', earningsData: historyEarningsData),
-                  ],
-                ),
+            ),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  EarningsTab(title: 'Today', earningsData: todayEarningsData),
+                  EarningsTab(title: 'History', earningsData: historyEarningsData),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

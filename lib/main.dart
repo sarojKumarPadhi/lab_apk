@@ -1,60 +1,31 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'Home/home_page.dart';
-import 'New Sample Path/New_Patient.dart';
-import 'New Sample Path/address_autofill.dart';
-import 'New Sample Path/all_rider_view.dart';
-import 'Phone_auth/mobile_number.dart';
-import 'Phone_auth/otp_varificatiion.dart';
-import 'Register_page/register_page.dart';
-import 'Splash screen/Splash_Screen.dart';
-import 'Splash screen/intro_slider_screen.dart';
-import 'Track Sample Path/Track_Sample.dart';
-import 'drawer_item/payment/Earnings_Screen.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:jonk_lab/page/splash_screen.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await GetStorage.init();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(MyApp(
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          // colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3:false,
-        ),
-        home:  HomePage(),
-      ))
-  );
+  runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  final Widget? child;
 
-  MyApp({this.child});
 
-  static void restartApp(BuildContext context) {
-  context.findAncestorStateOfType<_MyAppState>()!.restartApp();
-  }
+class MyApp extends StatelessWidget {
 
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  Key key = UniqueKey();
-  void restartApp() {
-    setState(() {
-      key = UniqueKey();
-    });
-  }
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return KeyedSubtree(
-      child: widget.child!,
-      key: key,
+
+    return const GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: SplashScreen(),
+
     );
   }
 }

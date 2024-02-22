@@ -9,26 +9,26 @@ class Datepicker extends StatefulWidget {
 }
 
 class _DatepickerState extends State<Datepicker> {
-  TextEditingController _dateController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
 
   void _openDatePicker(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return Container(
+        return SizedBox(
           height: 200, // Customize the height of the bottom sheet
           child: Column(
             children: [
-              Text(
+              const Text(
                 'Select a Date',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
               ),
-              SizedBox(height: 10),
-              Container(
+              const SizedBox(height: 10),
+              SizedBox(
                 height: 100, // Adjust the height as needed
                 child: ListView.builder(
                   scrollDirection: Axis.vertical, // Change to vertical scrolling
@@ -41,13 +41,13 @@ class _DatepickerState extends State<Datepicker> {
                         setState(() {
                           _selectedDate = currentDate;
                           _dateController.text =
-                          "${formattedDate}, ${currentDate.year}";
+                          "$formattedDate, ${currentDate.year}";
                         });
                         Navigator.pop(context);
                       },
                       child: Container(
                         width: 80, // Adjust the width of each date
-                        margin: EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: _selectedDate.day == currentDate.day
@@ -94,7 +94,7 @@ class _DatepickerState extends State<Datepicker> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Date Picker Example'),
+        title: const Text('Date Picker Example'),
       ),
       body: Column(
         children: [

@@ -1,121 +1,162 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:jonk_lab/global/color.dart';
+import 'package:jonk_lab/global/globalData.dart';
+
+import '../../controller/lab_basic_details.dart';
+import '../../page/test_menu_page.dart';
 
 class LabProfilePage extends StatefulWidget {
+  const LabProfilePage({super.key});
+
   @override
   State<LabProfilePage> createState() => _LabProfilePageState();
 }
 
-class _LabProfilePageState extends State<LabProfilePage>{
-
-
-
-  String? accountStatus;
-  String? name;
-  String? province;
-  String? mobile;
-  String email="hello.lab@gmail.com";
-  String? landMark;
-  String? city;
-  String? pinCode;
-  String? district;
-  String? state;
-  String? AC;
-  String? IfscCode;
-  String? bankName;
-  String? branchName;
-
-  String? auth = FirebaseAuth.instance.currentUser?.uid;
-  Future FetchData() async {
-    await FirebaseFirestore.instance.collection("laboratory").doc(auth).get().then((value){
-      final data=value.data() as Map<String,dynamic>;
-  setState(() {
-  accountStatus=data["AacountStatus"].toString();
-  name=data["LabDetails"]["labName"].toString();
-  province=data["LabDetails"]["selectProvince"].toString();
-  mobile=data["Number"].toString();
-
-     });
-
-    });
-  }
+class _LabProfilePageState extends State<LabProfilePage> {
+  LabBasicDetailsController labBasicDetailsController = Get.find();
 
   @override
-  void initState() { FetchData();
+  void initState() {
     super.initState();
-
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey,
-        title: Text("Lab Profile",style: TextStyle(fontWeight: FontWeight.w100,fontSize: 35),),
+        backgroundColor: primaryColor,
+        title: Text(
+          "Lab Profile",
+          style: GoogleFonts.acme(color: Colors.black, letterSpacing: 1),
+        ),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Account Status",
-                    style:
-                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text(accountStatus.toString(), style:
-                TextStyle(fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red)),
-              ],
-
-            ),
-            Divider(),
-
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              'Lab Details',
-              style: TextStyle(
-                fontSize: 21.0,
-                fontWeight: FontWeight.bold,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Account Status",
+                      style: GoogleFonts.acme(fontSize: deviceWidth! * .07)),
+                  labBasicDetailsController
+                              .labBasicDetailsData.value.accountStatus ==
+                          true
+                      ? const Icon(
+                          Icons.verified,
+                          color: Colors.green,
+                        )
+                      : const Icon(
+                          Icons.cancel,
+                          color: Colors.red,
+                        )
+                ],
               ),
-            ),
-            Divider(),
-            _buildDetailRow('Name', name.toString()),
-            _buildDetailRow('Province', province.toString()),
-            _buildDetailRow('Mobile No', mobile.toString()),
-            _buildDetailRow('Email id', email),
-            SizedBox(height: 20.0),
-            Text('Address',
-              style: TextStyle(
-                fontSize: 21.0,
-                fontWeight: FontWeight.bold,
+              const Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Test Menu",
+                    style: GoogleFonts.acme(
+                        color: Colors.black, fontSize: deviceWidth! * .05),
+                  ),
+                  ElevatedButton(onPressed: (){
+                    Get.to(()=>const TestMenuPage());
+                  }, child: const Icon(Icons.menu_open),)
+                ],
               ),
-            ),
-            Divider(),
-            _buildDetailRow('Land Mark', 'Village'),
-            _buildDetailRow('City', 'Panchkula'),
-            _buildDetailRow('PinCode', '111213'),
-            _buildDetailRow('District', 'Panchkula'),
-            _buildDetailRow('State', 'Hriyana'),
-            SizedBox(height: 20.0),
-            Text(
-              'Bank Details',
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
+              const Divider(),
+              Text(
+                'Lab Details',
+                style: GoogleFonts.acme(fontSize: deviceWidth! * .06),
               ),
-            ),
-            Divider(),
-            _buildDetailRow('Account No', '9876543210'),
-            _buildDetailRow('IFSC Code', 'ABCD1234567'),
-            _buildDetailRow('Bank Name', 'Bank of Example'),
-            _buildDetailRow('Branch Name', 'City Branch'),
-          ],
+              _buildDetailRow(
+                  'Name',
+                  labBasicDetailsController
+                          .labBasicDetailsData.value.basicDetails?.labName ??
+                      ""),
+              _buildDetailRow(
+                  'Mobile No',
+                  labBasicDetailsController
+                          .labBasicDetailsData.value.phoneNumber ??
+                      ""),
+              const SizedBox(height: 20.0),
+              Text(
+                'Address',
+                style: GoogleFonts.acme(fontSize: deviceWidth! * .06),
+              ),
+              const Divider(),
+              _buildDetailRow(
+                  'Land Mark',
+                  labBasicDetailsController
+                          .labBasicDetailsData.value.address?.city ??
+                      ""),
+              _buildDetailRow(
+                  'City',
+                  labBasicDetailsController
+                          .labBasicDetailsData.value.address?.city ??
+                      ""),
+              _buildDetailRow(
+                  'PinCode',
+                  labBasicDetailsController
+                          .labBasicDetailsData.value.address?.pinCode ??
+                      ""),
+              _buildDetailRow(
+                  'District',
+                  labBasicDetailsController
+                          .labBasicDetailsData.value.address?.district ??
+                      ""),
+              _buildDetailRow(
+                  'State',
+                  labBasicDetailsController
+                          .labBasicDetailsData.value.address?.state ??
+                      ""),
+              const SizedBox(height: 20.0),
+              Text(
+                'Bank Details',
+                style: GoogleFonts.acme(fontSize: deviceWidth! * .06),
+              ),
+              const Divider(),
+              _buildDetailRow(
+                  'Account No',
+                  labBasicDetailsController.labBasicDetailsData.value
+                          .bankDetails?.accountNumber ??
+                      ""),
+              _buildDetailRow(
+                  'IFSC Code',
+                  labBasicDetailsController
+                          .labBasicDetailsData.value.bankDetails?.ifscCode ??
+                      ""),
+              _buildDetailRow(
+                  'Bank Name',
+                  labBasicDetailsController
+                          .labBasicDetailsData.value.bankDetails?.bankName ??
+                      ""),
+              _buildDetailRow(
+                  'Branch Name',
+                  labBasicDetailsController
+                          .labBasicDetailsData.value.bankDetails?.branchName ??
+                      ""),
+              _buildDetailRow(
+                  'Latitude',
+                  labBasicDetailsController
+                          .labBasicDetailsData.value.address?.geoPoint.latitude
+                          .toString() ??
+                      ""),
+              _buildDetailRow(
+                  'Longitude',
+                  labBasicDetailsController
+                          .labBasicDetailsData.value.address?.geoPoint.longitude
+                          .toString() ??
+                      ""),
+            ],
+          ),
         ),
       ),
     );
@@ -127,12 +168,7 @@ class _LabProfilePageState extends State<LabProfilePage>{
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text(label, style: GoogleFonts.acme(fontSize: deviceWidth! * .05)),
           Text(value),
         ],
       ),

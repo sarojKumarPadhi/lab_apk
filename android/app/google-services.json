@@ -1,13 +1,14 @@
 {
   "project_info": {
-    "project_number": "462532468234",
-    "project_id": "zonk-fbbb1",
-    "storage_bucket": "zonk-fbbb1.appspot.com"
+    "project_number": "1068345217785",
+    "firebase_url": "https://jonk-amit-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "jonk-amit",
+    "storage_bucket": "jonk-amit.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:462532468234:android:51f1393a046ce88dd4c9f3",
+        "mobilesdk_app_id": "1:1068345217785:android:80171a043c01a1dd5a8828",
         "android_client_info": {
           "package_name": "com.geteideas.jonk_lab"
         }
@@ -15,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBaZWnJ0KrnuL_ile3HbJwrtD_zspXj0Lw"
+          "current_key": "AIzaSyCmUDhMAb-sZFnrH6e4gQqs5EgNcqPAmog"
         }
       ],
       "services": {
@@ -26,7 +27,7 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:462532468234:android:d8f2e1b4db06fa8fd4c9f3",
+        "mobilesdk_app_id": "1:1068345217785:android:da5ef9415d9be9565a8828",
         "android_client_info": {
           "package_name": "com.geteideas.zonk_rider"
         }
@@ -34,7 +35,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBaZWnJ0KrnuL_ile3HbJwrtD_zspXj0Lw"
+          "current_key": "AIzaSyCmUDhMAb-sZFnrH6e4gQqs5EgNcqPAmog"
         }
       ],
       "services": {
