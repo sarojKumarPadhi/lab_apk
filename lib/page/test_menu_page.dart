@@ -192,30 +192,28 @@ class _TestMenuPageState extends State<TestMenuPage> {
                 itemBuilder: (context, index) {
                   return InkWell(
                     onLongPress: () {
-
-                      QuickAlert.show(context: context,
+                      QuickAlert.show(
+                          context: context,
                           type: QuickAlertType.success,
-                        onCancelBtnTap: () {
-                          Navigator.pop(context);
-                        },
-                        onConfirmBtnTap: () {
-                          testMenuController.deleteTestMenu(index);
-                          Navigator.pop(context);
-                        },
-                        showConfirmBtn: true,
-                        showCancelBtn: true,
-                        title: ("Are you sure you want to delete"),
-                        confirmBtnText: "Yes",
-                        cancelBtnText: "No"
-                      )
-                      ;
+                          onCancelBtnTap: () {
+                            Navigator.pop(context);
+                          },
+                          onConfirmBtnTap: () {
+                            testMenuController.deleteTestMenu(index);
+                            Navigator.pop(context);
+                          },
+                          showConfirmBtn: true,
+                          showCancelBtn: true,
+                          title: ("Are you sure you want to delete"),
+                          confirmBtnText: "Yes",
+                          cancelBtnText: "No");
                     },
                     child: Container(
                       margin: EdgeInsets.symmetric(
                           vertical: deviceHeight! * .01,
                           horizontal: deviceWidth! * .03),
                       decoration: const BoxDecoration(
-                          color: Colors.black,
+                          color: Colors.black54,
                           borderRadius: BorderRadius.all(Radius.circular(2))),
                       child: ListTile(
                         title: Text(

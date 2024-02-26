@@ -3,8 +3,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/global/globalData.dart';
-
 import '../../controller/lab_basic_details.dart';
+import '../../controller/ride_price_controller.dart';
+import '../../page/ride_price_page.dart';
 import '../../page/test_menu_page.dart';
 
 class LabProfilePage extends StatefulWidget {
@@ -16,10 +17,12 @@ class LabProfilePage extends StatefulWidget {
 
 class _LabProfilePageState extends State<LabProfilePage> {
   LabBasicDetailsController labBasicDetailsController = Get.find();
+  RidePriceController ridePriceController = Get.put(RidePriceController());
 
   @override
   void initState() {
     super.initState();
+    print(ridePriceController.perKmPrice.value.toString());
   }
 
   @override
@@ -66,9 +69,29 @@ class _LabProfilePageState extends State<LabProfilePage> {
                     style: GoogleFonts.acme(
                         color: Colors.black, fontSize: deviceWidth! * .05),
                   ),
-                  ElevatedButton(onPressed: (){
-                    Get.to(()=>const TestMenuPage());
-                  }, child: const Icon(Icons.menu_open),)
+                  ElevatedButton(
+                    onPressed: () {
+                      Get.to(() => const TestMenuPage());
+                    },
+                    child: const Icon(Icons.menu_open),
+                  )
+                ],
+              ),
+              const Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Set Ride Price",
+                    style: GoogleFonts.acme(
+                        color: Colors.black, fontSize: deviceWidth! * .05),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Get.to(() =>  SetRidePrice());
+                    },
+                    child: const Icon(Icons.electric_bike),
+                  )
                 ],
               ),
               const Divider(),

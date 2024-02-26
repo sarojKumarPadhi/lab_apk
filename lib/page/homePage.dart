@@ -1,6 +1,7 @@
 import 'package:badges/badges.dart' as badges;
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,6 +12,7 @@ import 'package:jonk_lab/global/logout.dart';
 import 'package:jonk_lab/page/newPatient.dart';
 import 'package:jonk_lab/page/trackSample.dart';
 import 'package:lottie/lottie.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../controller/lab_basic_details.dart';
 import '../controller/test_menu_controller.dart';
@@ -29,10 +31,12 @@ class _HomePageState extends State<HomePage> {
   LabBasicDetailsController labBasicDetailsController =
       Get.put(LabBasicDetailsController());
   TestMenuController testMenuController = Get.put(TestMenuController());
+  static const platform = MethodChannel("methodChannel");
 
   @override
   void initState() {
     super.initState();
+    requestSmsPermission();
   }
 
   Future<bool> checkConnectivity() async {
@@ -43,6 +47,39 @@ class _HomePageState extends State<HomePage> {
     }
     return false;
   }
+
+
+
+
+
+  Future<void> sendSms() async {
+    try {
+      final String status = await platform.invokeMethod("sendSms", {"number": "8210109466"});
+      // Handle the status string if needed
+      print("SMS Status: $status");
+    } catch (e) {
+      // Handle any exceptions that occur during the invocation
+      print("Error sending SMS: $e");
+    }
+  }
+
+  Future<void> requestSmsPermission() async {
+    if (await Permission.sms.request().isGranted) {
+      // Permission is already granted, proceed with sending SMS
+      sendSms();
+    } else {
+      // Permission has not been granted yet. Request it.
+      if (await Permission.sms.request().isGranted) {
+        sendSms();
+      } else {
+        // Permission denied. Show an error message or handle it gracefully.
+        print('SMS permission denied');
+      }
+    }
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
