@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/global/globalData.dart';
-
 import '../controller/ride_price_controller.dart';
 
 class SetRidePrice extends StatelessWidget {
@@ -36,18 +35,18 @@ class SetRidePrice extends StatelessWidget {
                     Text("Set Minimum Price -:",
                         style:
                         GoogleFonts.acme(fontSize: deviceWidth! * .06)),
-                    Container(
+                    SizedBox(
                       width: deviceWidth! * .3,
                       child: TextFormField(
                         controller: minimumPriceController,
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           fillColor: Colors.black12,
                           filled: true,
                           hintText: "100",
-                          hintStyle: TextStyle(color: Colors.black12),
-                          prefixIcon: Icon(Icons.currency_rupee_outlined),
+                          hintStyle: const TextStyle(color: Colors.black12),
+                          prefixIcon: const Icon(Icons.currency_rupee_outlined),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(
                                   10)), // Removing the border
@@ -67,18 +66,18 @@ class SetRidePrice extends StatelessWidget {
                     Text("per km Price -:",
                         style:
                         GoogleFonts.acme(fontSize: deviceWidth! * .06)),
-                    Container(
+                    SizedBox(
                       width: deviceWidth! * .3,
                       child: TextFormField(
                         controller: perKmPriceController,
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           fillColor: Colors.black12,
                           filled: true,
                           hintText: "25",
-                          hintStyle: TextStyle(color: Colors.black12),
-                          prefixIcon: Icon(Icons.currency_rupee_outlined),
+                          hintStyle: const TextStyle(color: Colors.black12),
+                          prefixIcon: const Icon(Icons.currency_rupee_outlined),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(
                                   10)), // Removing the border
@@ -92,7 +91,7 @@ class SetRidePrice extends StatelessWidget {
                 SizedBox(
                   height: deviceHeight! * .04,
                 ),
-                Container(
+                SizedBox(
                   width: deviceWidth! * .6,
                   height: deviceHeight! * .06,
                   child: AnimatedButton(

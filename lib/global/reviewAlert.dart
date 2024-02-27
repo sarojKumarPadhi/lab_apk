@@ -1,15 +1,14 @@
 import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:jonk_lab/global/progressIndicator.dart';
 import 'package:jonk_lab/page/homePage.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-
-
 
 GetStorage data = GetStorage();
 
@@ -19,7 +18,6 @@ Map<String, dynamic> labLocation = data.read("labLatLongWithLocation");
 Map<String, dynamic> bankDetails = data.read("bankDetails");
 String phoneNumber = FirebaseAuth.instance.currentUser!.phoneNumber!;
 String fcmToken = data.read("fcmToken");
-
 
 File aadharImageFile = File(data.read("aadharImageFile"));
 File panImageFile = File(data.read("panImageFile"));
@@ -41,28 +39,25 @@ List<File> documents = [
   picture4
 ];
 
-
 List<String> downloadImageUrls = [];
-
-
-
 
 uploadImage() async {
   for (int i = 0; i < 8; i++) {
-    Reference ref = FirebaseStorage.instance.ref().child('lab').child(basicDetails["labName"]).child("${DateTime.now().toString()}.jpg");
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child('lab')
+        .child(basicDetails["labName"])
+        .child("${DateTime.now().toString()}.jpg");
     UploadTask uploadTask = ref.putFile(File(documents[i].path));
     TaskSnapshot snapshot = await uploadTask;
     downloadImageUrls.add(await snapshot.ref.getDownloadURL());
   }
 }
 
-
-
-
 reviewAlert(context) {
   Future.delayed(
     const Duration(seconds: 0),
-        () async {
+    () async {
       try {
         showDialog(
           context: context,
@@ -73,11 +68,14 @@ reviewAlert(context) {
         );
         await uploadImage();
         data.remove("auth");
-        GeoPoint geoPoint = GeoPoint(labLocation["latitude"], labLocation["longitude"]);
+        GeoPoint geoPoint =
+            GeoPoint(labLocation["latitude"], labLocation["longitude"]);
 
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-        await firebaseFirestore.collection("lab").doc(
-            FirebaseAuth.instance.currentUser!.uid).set({
+        await firebaseFirestore
+            .collection("lab")
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .set({
           "accountStatus": false,
           "phoneNumber": phoneNumber,
           "deviceToken": fcmToken,
@@ -105,39 +103,40 @@ reviewAlert(context) {
             "bankPassBookUrl": downloadImageUrls[2],
             "labCertificateUrl": downloadImageUrls[3],
             "labPictureUrl": [
-              downloadImageUrls[4],downloadImageUrls[5],downloadImageUrls[6],downloadImageUrls[7]
+              downloadImageUrls[4],
+              downloadImageUrls[5],
+              downloadImageUrls[6],
+              downloadImageUrls[7]
             ]
           }
         });
-
-
+        await data.erase();
         showCongratulationsDialog(context);
-
       } catch (e) {
         print('Error sending data to Firestore: $e');
       }
     },
   );
-
 }
 
-void showCongratulationsDialog(BuildContext context){
+void showCongratulationsDialog(BuildContext context) {
   QuickAlert.show(
-    barrierDismissible: false, // This makes the dialog dismissible
+    barrierDismissible: false,
+    // This makes the dialog dismissible
     context: context,
     type: QuickAlertType.success,
     title: "Congratulations",
     showConfirmBtn: true,
     onConfirmBtnTap: () async {
-      Get.offAll(() => const HomePage(), transition: Transition.leftToRight,
+      Get.offAll(() => const HomePage(),
+          transition: Transition.leftToRight,
           duration: const Duration(milliseconds: 600));
     },
   );
 
-
   Future.delayed(const Duration(seconds: 2), () {
-    Get.offAll(() => const HomePage(), transition: Transition.leftToRight,
+    Get.offAll(() => const HomePage(),
+        transition: Transition.leftToRight,
         duration: const Duration(milliseconds: 600));
-
   });
 }

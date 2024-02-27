@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:jonk_lab/global/globalData.dart';
 import 'package:jonk_lab/global/sucessAlert.dart';
 
+import '../page/otpVerify.dart';
+
 verifyOtp(BuildContext context) async {
   try {
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
@@ -17,10 +19,15 @@ verifyOtp(BuildContext context) async {
     // auth.write("auth", FirebaseAuth.instance.currentUser!.uid);
     successAlert(context);
   } catch (e) {
+    OtpVerifyState otpVerifyState = OtpVerifyState();
+    otpVerifyState.pinController.clear();
+    Navigator.pop(context);
+
     Get.snackbar(
       colorText: Colors.white,
-        icon: const Icon(Icons.dangerous,color: Colors.white),
-        "Alert", "Enter a Valid Otp",
+      icon: const Icon(Icons.dangerous, color: Colors.white),
+      "Alert",
+      "Enter a Valid Otp",
       backgroundColor: Colors.red,
     );
   }

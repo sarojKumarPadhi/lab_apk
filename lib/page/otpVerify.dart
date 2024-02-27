@@ -14,10 +14,10 @@ class OtpVerify extends StatefulWidget {
   const OtpVerify({Key? key}) : super(key: key);
 
   @override
-  State<OtpVerify> createState() => _OtpVerifyState();
+  State<OtpVerify> createState() => OtpVerifyState();
 }
 
-class _OtpVerifyState extends State<OtpVerify> {
+class OtpVerifyState extends State<OtpVerify> {
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController pinController = TextEditingController();
