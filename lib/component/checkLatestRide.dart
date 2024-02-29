@@ -32,7 +32,6 @@ Future<bool> checkLatestRide() async {
           data["patientDetails"]["latitude"],
           data["patientDetails"]["longitude"],
         );
-        NewPatient.samples = data["patientDetails"]["samples"];
         NewPatient.tests = data["patientDetails"]["test"];
 
         return true; // Exit the function if an idle ride is found

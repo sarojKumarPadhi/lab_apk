@@ -1,5 +1,6 @@
 import 'package:badges/badges.dart' as badges;
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -15,9 +16,11 @@ import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../controller/lab_basic_details.dart';
+import '../controller/push_notification_controller.dart';
 import '../controller/test_menu_controller.dart';
 import '../drawer_item/Support.dart';
 import '../drawer_item/payment/Earnings_Screen.dart';
+import '../model/active_driver_in_realtime_database.dart';
 import 'notificationPage.dart';
 
 class HomePage extends StatefulWidget {
@@ -37,6 +40,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     requestSmsPermission();
+
   }
 
   Future<bool> checkConnectivity() async {
@@ -48,13 +52,10 @@ class _HomePageState extends State<HomePage> {
     return false;
   }
 
-
-
-
-
   Future<void> sendSms() async {
     try {
-      final String status = await platform.invokeMethod("sendSms", {"number": "8210109466"});
+      final String status =
+          await platform.invokeMethod("sendSms", {"number": "8210109466"});
       // Handle the status string if needed
       print("SMS Status: $status");
     } catch (e) {
@@ -66,20 +67,17 @@ class _HomePageState extends State<HomePage> {
   Future<void> requestSmsPermission() async {
     if (await Permission.sms.request().isGranted) {
       // Permission is already granted, proceed with sending SMS
-      sendSms();
+      // sendSms();
     } else {
       // Permission has not been granted yet. Request it.
       if (await Permission.sms.request().isGranted) {
-        sendSms();
+        // sendSms();
       } else {
         // Permission denied. Show an error message or handle it gracefully.
         print('SMS permission denied');
       }
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -473,4 +471,17 @@ class _HomePageState extends State<HomePage> {
           )),
     );
   }
+
+  // List<ActiveDriverRealTimeDataBase> list = [];
+
+
+
+
+  // Map<String, dynamic> convertToMap(Map<dynamic, dynamic> input) {
+  //   Map<String, dynamic> output = {};
+  //   input.forEach((key, value) {
+  //     output[key.toString()] = value;
+  //   });
+  //   return output;
+  // }
 }

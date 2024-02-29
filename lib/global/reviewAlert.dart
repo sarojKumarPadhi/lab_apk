@@ -77,6 +77,8 @@ reviewAlert(context) {
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .set({
           "accountStatus": false,
+          "visibleStatus":false,
+          "userUid": FirebaseAuth.instance.currentUser!.uid,
           "phoneNumber": phoneNumber,
           "deviceToken": fcmToken,
           "basicDetails": basicDetails,

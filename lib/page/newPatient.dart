@@ -22,8 +22,7 @@ class NewPatient extends StatefulWidget {
   static String? patientName;
   static String? mobileNumber;
   static String? age;
-  static String? tests;
-  static String? samples;
+  static List<String>? tests;
   static String? patientLocation;
   static LatLng? latLng;
 
@@ -41,8 +40,6 @@ class _NewPatientState extends State<NewPatient>
   final nameTextEditing = TextEditingController();
   final mobileTextEditing = TextEditingController();
   final ageTextEditing = TextEditingController();
-  final testTextEditing = TextEditingController();
-  final sampleTextEditing = TextEditingController();
   TestMenuController testMenuController = Get.find();
 
   @override
@@ -61,10 +58,7 @@ class _NewPatientState extends State<NewPatient>
         ? mobileTextEditing.text = NewPatient.mobileNumber!
         : "";
     NewPatient.age != null ? ageTextEditing.text = NewPatient.age! : "";
-    NewPatient.tests != null ? testTextEditing.text = NewPatient.tests! : "";
-    NewPatient.samples != null
-        ? sampleTextEditing.text = NewPatient.samples!
-        : "";
+
   }
 
   @override
@@ -140,18 +134,16 @@ class _NewPatientState extends State<NewPatient>
                   if (nameTextEditing.text.isNotEmpty &&
                       mobileTextEditing.text.isNotEmpty &&
                       ageTextEditing.text.isNotEmpty &&
-                      testTextEditing.text.isNotEmpty &&
-                      sampleTextEditing.text.isNotEmpty &&
+                      NewPatient.tests?.length!=0 &&
                       NewPatient.patientLocation!.isNotEmpty) {
                     NewPatient.patientName = nameTextEditing.text;
                     NewPatient.mobileNumber = mobileTextEditing.text;
                     NewPatient.age = ageTextEditing.text;
-                    NewPatient.samples = sampleTextEditing.text;
-                    NewPatient.tests = testTextEditing.text;
 
-                    Get.to(() => SearchRiderPage(),
+
+                    Get.to(() => const SearchRiderPage(),
                         transition: Transition.leftToRight,
-                        duration: Duration(milliseconds: 500));
+                        duration: const Duration(milliseconds: 500));
                   } else {
                     Fluttertoast.showToast(msg: "Enter all fields");
                   }
@@ -366,8 +358,6 @@ class _NewPatientState extends State<NewPatient>
                             NewPatient.patientName = nameTextEditing.text;
                             NewPatient.mobileNumber = mobileTextEditing.text;
                             NewPatient.age = ageTextEditing.text;
-                            NewPatient.tests = testTextEditing.text;
-                            NewPatient.samples = sampleTextEditing.text;
                             Get.to(() => const PatientLocationPage());
                           },
                           readOnly: true,
@@ -494,7 +484,7 @@ class _NewPatientState extends State<NewPatient>
         totalPrice += int.parse(testMenuModel.testPrice);
       }
     });
-
+ NewPatient.tests=selectedTestNames;
     // Trigger a UI update
     setState(() {});
   }
