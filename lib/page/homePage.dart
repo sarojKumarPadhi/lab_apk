@@ -1,6 +1,5 @@
 import 'package:badges/badges.dart' as badges;
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,13 +13,10 @@ import 'package:jonk_lab/page/newPatient.dart';
 import 'package:jonk_lab/page/trackSample.dart';
 import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 import '../controller/lab_basic_details.dart';
-import '../controller/push_notification_controller.dart';
 import '../controller/test_menu_controller.dart';
 import '../drawer_item/Support.dart';
 import '../drawer_item/payment/Earnings_Screen.dart';
-import '../model/active_driver_in_realtime_database.dart';
 import 'notificationPage.dart';
 
 class HomePage extends StatefulWidget {
@@ -40,7 +36,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     requestSmsPermission();
-
   }
 
   Future<bool> checkConnectivity() async {
@@ -304,7 +299,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               InkWell(
                                 onTap: () {
-                                  Get.to(() => NewPatient(),
+                                  Get.to(() => const NewPatient(),
                                       transition: Transition.leftToRight,
                                       duration:
                                           const Duration(milliseconds: 400));

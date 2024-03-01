@@ -1,7 +1,8 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
+import 'package:http/http.dart' as http;
 class PushNotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
@@ -96,5 +97,63 @@ class PushNotificationService {
     print(
         "This is your device token===================================== :- \n$token");
     return token;
+  }
+
+
+
+  // Future<void> sendNotification(String deviceToken, String headerData,String bodyData) async {
+  //   final url = Uri.parse('https://fcm.googleapis.com/fcm/send');
+  //   final headers = {
+  //     'Content-Type': 'application/json',
+  //     'Authorization': 'key=AAAAa7EVXgo:APA91bHqWt8YtjjEdktLMKf33oI0jWRebAERJIeuDeIUtmwzpZLEjs_TFTDglQF0x2_YV8ja-bDQpN0NcH1RTrf-LKSCUX0Zmxbf3Ufnkrw6FyHo_segLClJsQ0sU98Kf3cElnegg4B1',
+  //   };
+  //   final body = jsonEncode({
+  //     'notification': {
+  //       'title': headerData,
+  //       'body': bodyData,
+  //     },
+  //     "data":{
+  //       "click_action":"FLUTTER_NOTIFICATION_CLICK",
+  //       "id":"1",
+  //       "status":"done",
+  //       "rideRequestId":"152e9960-904c-1ee7-b7e4-77cc43f0c501"
+  //     },
+  //     'to': deviceToken,
+  //   });
+  //   final response = await http.post(url, headers: headers, body: body);
+  //   if (response.statusCode == 200) {
+  //     print('Notification sent successfully!');
+  //   } else {
+  //     print('Failed to send notification. Error code: ${response.statusCode}');
+  //   }
+  // }
+
+   Future<void> sendPushNotification({
+    required List<String> tokens,
+    required String rideRequestId
+  }) async {
+    const String urlString = "https://fcm.googleapis.com/fcm/send";
+    final Map<String, dynamic> requestBody = {
+      "registration_ids": tokens,
+      "notification": {"title": "You have a New Request", "body": "In Your App"},
+      "data": {"rideRequestId": rideRequestId}
+    };
+
+    final http.Response response = await http.post(
+      Uri.parse(urlString),
+      headers: <String, String>{
+        "Content-Type": "application/json",
+        "Authorization":
+        "key=AAAAa7EVXgo:APA91bHqWt8YtjjEdktLMKf33oI0jWRebAERJIeuDeIUtmwzpZLEjs_TFTDglQF0x2_YV8ja-bDQpN0NcH1RTrf-LKSCUX0Zmxbf3Ufnkrw6FyHo_segLClJsQ0sU98Kf3cElnegg4B1",
+      },
+      body: jsonEncode(requestBody),
+    );
+
+    if (response.statusCode == 200) {
+      print("Push notification sent successfully.");
+    } else {
+      print(
+          "Failed to send push notification. Status code: ${response.statusCode}");
+    }
   }
 }

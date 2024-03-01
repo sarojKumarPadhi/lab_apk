@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
   navigateToScreen() async {
     String? auth = FirebaseAuth.instance.currentUser?.uid;
     if (auth != null) {
-      if (await checkUserExistInDatabase()) {
+      if (await checkUserInRegistrationProcess()) {
         Get.offAll(() => const UserRegistration(),
             duration: const Duration(milliseconds: 300),
             transition: Transition.leftToRight);
@@ -63,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  Future<bool> checkUserExistInDatabase() async {
+  Future<bool> checkUserInRegistrationProcess() async {
     // String? auth = FirebaseAuth.instance.currentUser?.uid;
     GetStorage authData = GetStorage();
     var status = await authData.read("auth");

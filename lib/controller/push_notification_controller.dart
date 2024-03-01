@@ -2,11 +2,11 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:get/get.dart';
 import 'package:jonk_lab/page/newPatient.dart';
-
 import '../model/active_driver_in_realtime_database.dart';
 
 class PushNotificationController extends GetxController {
   RxList<String> riderUid = <String>[].obs;
+  List<String> deviceToken=[];
   RxList<ActiveDriverRealTimeDataBase> allOnlineDriverData =
       <ActiveDriverRealTimeDataBase>[].obs;
   RxList<String> keysRetrieved = <String>[].obs;
@@ -14,14 +14,12 @@ class PushNotificationController extends GetxController {
   @override
   onInit() {
     super.onInit();
-
     getAllOnlineDriverId();
   }
 
 
   void getDataFromRealTimeDatabase(String key) {
     DatabaseReference databaseReference = FirebaseDatabase.instance.ref().child("rider");
-
     // Query the database for the specific key
     databaseReference.orderByKey().equalTo(key).onValue.listen((event) {
       if (event.snapshot.value != null) {
@@ -30,6 +28,7 @@ class PushNotificationController extends GetxController {
           riderData.forEach((riderKey, riderInfo) {
             // Ensure riderInfo is a Map<dynamic, dynamic>
             if (riderInfo is Map<dynamic, dynamic>) {
+              deviceToken.add(riderInfo['deviceTokens']);
               allOnlineDriverData.add(ActiveDriverRealTimeDataBase(
                   name: riderInfo['name'],
                   deviceToken: riderInfo['deviceTokens'],
