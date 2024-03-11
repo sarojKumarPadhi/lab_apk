@@ -1,5 +1,6 @@
 import 'package:badges/badges.dart' as badges;
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,22 +14,25 @@ import 'package:jonk_lab/page/newPatient.dart';
 import 'package:jonk_lab/page/trackSample.dart';
 import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
+
 import '../controller/lab_basic_details.dart';
 import '../controller/test_menu_controller.dart';
 import '../drawer_item/Support.dart';
 import '../drawer_item/payment/Earnings_Screen.dart';
+import '../service/pushNotificationService.dart';
+import '../services/email_service.dart';
 import 'notificationPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePage> createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   LabBasicDetailsController labBasicDetailsController =
-      Get.put(LabBasicDetailsController());
+  Get.put(LabBasicDetailsController());
   TestMenuController testMenuController = Get.put(TestMenuController());
   static const platform = MethodChannel("methodChannel");
 
@@ -36,6 +40,13 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     requestSmsPermission();
+    /// send otp using email address
+    PushNotificationService().initializeCloudMessaging(context);
+    PushNotificationService().requestNotificationsPermission();
+
+    FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: true, badge: true, sound: true);
+
   }
 
   Future<bool> checkConnectivity() async {
@@ -47,10 +58,10 @@ class _HomePageState extends State<HomePage> {
     return false;
   }
 
-  Future<void> sendSms() async {
+  static Future<void> sendSms(String number, String otp) async {
     try {
-      final String status =
-          await platform.invokeMethod("sendSms", {"number": "8210109466"});
+      final String status = await platform.invokeMethod(
+          "sendSms", {"number": number, "otp": otp});
       // Handle the status string if needed
       print("SMS Status: $status");
     } catch (e) {
@@ -59,13 +70,33 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  /// send otp using email address
+ static void sendOTP(String otp) {
+    final emailService = EmailService(
+      username: 'chanchalskylabstech@gmail.com',
+      password: 'yfnnhzotieafpxws',
+    );
+
+    emailService
+        .sendEmail(
+      "amitkumar.edugaon@gmail.com",
+      'Your OTP for Verification',
+      'Your OTP is: $otp',
+    );
+  }
+
+
   Future<void> requestSmsPermission() async {
-    if (await Permission.sms.request().isGranted) {
+    if (await Permission.sms
+        .request()
+        .isGranted) {
       // Permission is already granted, proceed with sending SMS
-      // sendSms();
+      sendSms("9905326811", "2345678");
     } else {
       // Permission has not been granted yet. Request it.
-      if (await Permission.sms.request().isGranted) {
+      if (await Permission.sms
+          .request()
+          .isGranted) {
         // sendSms();
       } else {
         // Permission denied. Show an error message or handle it gracefully.
@@ -76,8 +107,14 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height; //834
-    var width = MediaQuery.of(context).size.width; //392
+    var height = MediaQuery
+        .of(context)
+        .size
+        .height; //834
+    var width = MediaQuery
+        .of(context)
+        .size
+        .width; //392
     print(testMenuController.testMenuList.length.toString());
     return Container(
       decoration: const BoxDecoration(
@@ -97,7 +134,7 @@ class _HomePageState extends State<HomePage> {
                   padding: EdgeInsets.symmetric(horizontal: deviceWidth! * .06),
                   child: badges.Badge(
                     badgeContent:
-                        Text('0', style: GoogleFonts.acme(color: Colors.white)),
+                    Text('0', style: GoogleFonts.acme(color: Colors.white)),
                     child: Icon(
                       Icons.notification_important_rounded,
                       size: deviceWidth! * .1,
@@ -116,60 +153,62 @@ class _HomePageState extends State<HomePage> {
                       color: primaryColor,
                     ),
                     child: Obx(
-                      () => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          () =>
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Column(
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment
+                                    .spaceBetween,
                                 children: [
-                                  Text(
-                                    labBasicDetailsController
+                                  Column(
+                                    children: [
+                                      Text(
+                                        labBasicDetailsController
                                             .labBasicDetailsData
                                             .value
                                             .basicDetails
                                             ?.labName ??
-                                        "pratham lab..",
-                                    style: GoogleFonts.acme(
-                                        fontSize: deviceWidth! * .09),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        labBasicDetailsController
-                                                    .labBasicDetailsData
-                                                    .value
-                                                    .accountStatus ==
-                                                true
-                                            ? "Verified"
-                                            : "Not Verified ",
+                                            "pratham lab..",
                                         style: GoogleFonts.acme(
-                                            fontSize: deviceWidth! * .05),
+                                            fontSize: deviceWidth! * .09),
                                       ),
-                                      labBasicDetailsController
-                                                  .labBasicDetailsData
-                                                  .value
-                                                  .accountStatus ==
+                                      Row(
+                                        children: [
+                                          Text(
+                                            labBasicDetailsController
+                                                .labBasicDetailsData
+                                                .value
+                                                .accountStatus ==
+                                                true
+                                                ? "Verified"
+                                                : "Not Verified ",
+                                            style: GoogleFonts.acme(
+                                                fontSize: deviceWidth! * .05),
+                                          ),
+                                          labBasicDetailsController
+                                              .labBasicDetailsData
+                                              .value
+                                              .accountStatus ==
                                               true
-                                          ? const Icon(
-                                              Icons.verified,
-                                              color: Colors.green,
-                                            )
-                                          : const Icon(
-                                              Icons.cancel,
-                                              color: Colors.red,
-                                            )
+                                              ? const Icon(
+                                            Icons.verified,
+                                            color: Colors.green,
+                                          )
+                                              : const Icon(
+                                            Icons.cancel,
+                                            color: Colors.red,
+                                          )
+                                        ],
+                                      ),
                                     ],
                                   ),
+                                  Image.asset("assets/icon/labIcon.png",
+                                      width: deviceWidth! * .25),
                                 ],
                               ),
-                              Image.asset("assets/icon/labIcon.png",
-                                  width: deviceWidth! * .25),
                             ],
                           ),
-                        ],
-                      ),
                     )),
                 ListTile(
                   leading: const Icon(
@@ -248,162 +287,169 @@ class _HomePageState extends State<HomePage> {
               if (snapshot.hasData) {
                 if (snapshot.data == true) {
                   return Obx(
-                    () => Column(
-                      children: [
+                        () =>
                         Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Row(
+                          children: [
+                            Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20, top: 20),
-                                    child: Text(
-                                      "Hello, ${labBasicDetailsController.labBasicDetailsData.value.basicDetails?.labName ?? ""}",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: width * 6.3 / 100,
-                                          fontWeight: FontWeight.w600),
-                                    ),
+                                  Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 20, top: 20),
+                                        child: Text(
+                                          "Hello, ${labBasicDetailsController
+                                              .labBasicDetailsData.value
+                                              .basicDetails?.labName ?? ""}",
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: width * 6.3 / 100,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              Padding(
-                                padding:
+                                  Padding(
+                                    padding:
                                     const EdgeInsets.only(left: 20, top: 5),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.location_on),
-                                    Text(
-                                      labBasicDetailsController
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.location_on),
+                                        Text(
+                                          labBasicDetailsController
                                               .labBasicDetailsData
                                               .value
                                               .address
                                               ?.city ??
-                                          "Hisar",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: width * 4 / 100,
-                                          fontWeight: FontWeight.w400),
+                                              "Hisar",
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: width * 4 / 100,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ),
-                            ]),
-                        Padding(
-                          padding: EdgeInsets.only(
-                            top: height * .04,
-                            left: width * .1,
-                          ),
-                          child: Row(
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  Get.to(() => const NewPatient(),
-                                      transition: Transition.leftToRight,
-                                      duration:
-                                          const Duration(milliseconds: 400));
-                                },
-                                child: Container(
-                                  width: width * .4,
-                                  height: height * .2,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15),
-                                    color: const Color(0xFF111111),
                                   ),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
+                                ]),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                top: height * .04,
+                                left: width * .1,
+                              ),
+                              child: Row(
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      Get.to(() => const NewPatient(),
+                                          transition: Transition.leftToRight,
+                                          duration:
+                                          const Duration(milliseconds: 400));
+                                    },
+                                    child: Container(
+                                      width: width * .4,
+                                      height: height * .2,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(15),
+                                        color: const Color(0xFF111111),
+                                      ),
+                                      child: Column(
                                         children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 9, right: 15),
+                                                child: SvgPicture.asset(
+                                                    "assets/icon/addNewSample.svg",
+                                                    width: deviceWidth! * .1),
+                                              )
+                                            ],
+                                          ),
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                top: 9, right: 15),
-                                            child: SvgPicture.asset(
-                                                "assets/icon/addNewSample.svg",
-                                                width: deviceWidth! * .1),
+                                                left: 8),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  "New \nSample \nPath",
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: height / 40,
+                                                      fontWeight: FontWeight
+                                                          .bold),
+                                                ),
+                                              ],
+                                            ),
                                           )
                                         ],
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 8),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              "New \nSample \nPath",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: height / 40,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                              top: height * .05, left: width * .1),
-                          child: Row(
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  Get.to(() => const TrackSample(),
-                                      transition: Transition.leftToRight,
-                                      duration:
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: height * .05, left: width * .1),
+                              child: Row(
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      Get.to(() => const TrackSample(),
+                                          transition: Transition.leftToRight,
+                                          duration:
                                           const Duration(milliseconds: 400));
-                                },
-                                child: Container(
-                                  width: width * .4,
-                                  height: height * .20,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15),
-                                    color: const Color(0xFF111111),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
+                                    },
+                                    child: Container(
+                                      width: width * .4,
+                                      height: height * .20,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(15),
+                                        color: const Color(0xFF111111),
+                                      ),
+                                      child: Column(
                                         children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 9, right: 15),
+                                                child: SvgPicture.asset(
+                                                    "assets/icon/newSamplePath.svg",
+                                                    width: deviceWidth! * .1),
+                                              )
+                                            ],
+                                          ),
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                top: 9, right: 15),
-                                            child: SvgPicture.asset(
-                                                "assets/icon/newSamplePath.svg",
-                                                width: deviceWidth! * .1),
+                                                left: 8),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  "Track \nSample \nPath",
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: height / 40,
+                                                      fontWeight: FontWeight
+                                                          .bold),
+                                                ),
+                                              ],
+                                            ),
                                           )
                                         ],
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 8),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              "Track \nSample \nPath",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: height / 40,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
                   );
                 } else {
                   return Center(
@@ -467,16 +513,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // List<ActiveDriverRealTimeDataBase> list = [];
+// List<ActiveDriverRealTimeDataBase> list = [];
 
-
-
-
-  // Map<String, dynamic> convertToMap(Map<dynamic, dynamic> input) {
-  //   Map<String, dynamic> output = {};
-  //   input.forEach((key, value) {
-  //     output[key.toString()] = value;
-  //   });
-  //   return output;
-  // }
+// Map<String, dynamic> convertToMap(Map<dynamic, dynamic> input) {
+//   Map<String, dynamic> output = {};
+//   input.forEach((key, value) {
+//     output[key.toString()] = value;
+//   });
+//   return output;
+// }
 }

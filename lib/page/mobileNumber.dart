@@ -1,5 +1,6 @@
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jonk_lab/global/globalData.dart';
 import 'package:jonk_lab/global/progressIndicator.dart';
 import 'package:lottie/lottie.dart';
@@ -32,6 +33,9 @@ class _MobileNumberState extends State<MobileNumber> {
                 const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 10),
             child: ListView(
               children: [
+                // SvgPicture.asset(
+                //
+                //     "assets/icon/otpVerification.svg"),
                 Lottie.asset('assets/lotifiles/enterPhone.json'),
                 SizedBox(
                   height: height * 8 / 100,

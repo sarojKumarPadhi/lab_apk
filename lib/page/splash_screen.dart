@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -6,11 +7,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:jonk_lab/global/globalData.dart';
 import 'package:jonk_lab/page/homePage.dart';
 import 'package:jonk_lab/page/introSliderScreen.dart';
-import 'package:jonk_lab/page/searchRiderPage.dart';
 import 'package:jonk_lab/page/userRegistration.dart';
-
-import '../component/checkLatestRide.dart';
-import '../controller/lab_basic_details.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -37,24 +34,24 @@ class _SplashScreenState extends State<SplashScreen> {
             duration: const Duration(milliseconds: 300),
             transition: Transition.leftToRight);
       } else {
-        bool status = await checkLatestRide();
-        if (status) {
-          LabBasicDetailsController labBasicDetailsController = Get.put(LabBasicDetailsController());
-          print(labBasicDetailsController.labBasicDetailsData.value.userId.toString());
-
-          Future.delayed(const Duration(seconds: 3),() {
-            Get.offAll(() => const SearchRiderPage(),
-                duration: const Duration(milliseconds: 300),
-                transition: Transition.leftToRight);
-          },);
-
-
-
-        } else {
-          Get.offAll(() => const HomePage(),
-              duration: const Duration(milliseconds: 300),
-              transition: Transition.leftToRight);
-        }
+        // bool status = await checkLatestRide();
+        // if (status) {
+        //   LabBasicDetailsController labBasicDetailsController = Get.put(LabBasicDetailsController());
+        //   print(labBasicDetailsController.labBasicDetailsData.value.userId.toString());
+        //
+        //   Future.delayed(const Duration(seconds: 3),() {
+        //     Get.offAll(() => const SearchRiderPage(),
+        //         duration: const Duration(milliseconds: 300),
+        //         transition: Transition.leftToRight);
+        //   },);
+        //
+        //
+        //
+        // } else {
+        Get.offAll(() => const HomePage(),
+            duration: const Duration(milliseconds: 300),
+            transition: Transition.leftToRight);
+        // }
       }
     } else {
       Get.offAll(() => const IntroSliderScreen(),
@@ -78,14 +75,15 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     deviceWidth = MediaQuery.of(context).size.width;
     deviceHeight = MediaQuery.of(context).size.height;
-    return const Scaffold(
+    return Scaffold(
         backgroundColor: Colors.white,
         body: ColorfulSafeArea(
           color: Colors.white,
           child: Center(
-            child:
-                Image(image: AssetImage("assets/images/jonk.png"), width: 200),
-          ),
+              child: FadeInDown(
+            child: const Image(
+                image: AssetImage("assets/images/jonk.png"), width: 200),
+          )),
         ));
   }
 }

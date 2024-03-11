@@ -1,8 +1,6 @@
 import 'package:audioplayers/audioplayers.dart' as audio;
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_selector/widget/flutter_multi_select.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,23 +11,19 @@ import 'package:jonk_lab/model/test_menu_model.dart';
 import 'package:jonk_lab/page/patientLocationPage.dart';
 import 'package:jonk_lab/page/searchRiderPage.dart';
 import 'package:record/record.dart';
-
 import '../controller/test_menu_controller.dart';
 
 class NewPatient extends StatefulWidget {
   const NewPatient({Key? key}) : super(key: key);
-
   static String? patientName;
   static String? mobileNumber;
   static String? age;
   static List<String>? tests;
   static String? patientLocation;
   static LatLng? latLng;
-
   @override
   State<NewPatient> createState() => _NewPatientState();
 }
-
 class _NewPatientState extends State<NewPatient>
     with SingleTickerProviderStateMixin {
   String audioPath = "";
@@ -39,11 +33,13 @@ class _NewPatientState extends State<NewPatient>
   late AnimationController _controller;
   final nameTextEditing = TextEditingController();
   final mobileTextEditing = TextEditingController();
+  final priceController = TextEditingController();
   final ageTextEditing = TextEditingController();
   TestMenuController testMenuController = Get.find();
-
   @override
   void initState() {
+    print("this is a test menu");
+    print(testMenuController.testMenuList.length.toString());
     audioPlayer = AudioPlayer();
     audioRecord = Record();
     super.initState();
@@ -58,16 +54,13 @@ class _NewPatientState extends State<NewPatient>
         ? mobileTextEditing.text = NewPatient.mobileNumber!
         : "";
     NewPatient.age != null ? ageTextEditing.text = NewPatient.age! : "";
-
   }
-
   @override
   void dispose() {
     audioRecord.dispose();
     audioPlayer.dispose();
     super.dispose();
   }
-
   Future<void> startRecording() async {
     try {
       if (await audioRecord.hasPermission()) {
@@ -80,7 +73,6 @@ class _NewPatientState extends State<NewPatient>
       print(e);
     }
   }
-
   Future<void> stopRecording() async {
     try {
       String? path = await audioRecord.stop();
@@ -102,11 +94,8 @@ class _NewPatientState extends State<NewPatient>
       print("playing $e");
     }
   }
-
   List<dynamic> selectedDataString = [];
-  int totalPrice = 0;
   List<TestMenuModel> selectedTestMenu = [];
-
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height; //834
@@ -134,12 +123,11 @@ class _NewPatientState extends State<NewPatient>
                   if (nameTextEditing.text.isNotEmpty &&
                       mobileTextEditing.text.isNotEmpty &&
                       ageTextEditing.text.isNotEmpty &&
-                      NewPatient.tests?.length!=0 &&
+                      NewPatient.tests!.isNotEmpty &&
                       NewPatient.patientLocation!.isNotEmpty) {
                     NewPatient.patientName = nameTextEditing.text;
                     NewPatient.mobileNumber = mobileTextEditing.text;
                     NewPatient.age = ageTextEditing.text;
-
 
                     Get.to(() => const SearchRiderPage(),
                         transition: Transition.leftToRight,
@@ -219,25 +207,17 @@ class _NewPatientState extends State<NewPatient>
                       )
                     ],
                   ),
-                  Container(
-                    height: height * 7 / 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(deviceWidth! * .01),
-                      color: const Color(0xFFE7E3E3),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: TextField(
-                        controller: mobileTextEditing,
-                        cursorColor: Colors.black,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "+91",
-                            hintStyle: TextStyle(
-                                fontSize: width * 3.9 / 100,
-                                color: const Color(0xFFC0C0C0))),
-                      ),
+                  TextFormField(
+                    maxLength: 10,
+                    controller: mobileTextEditing,
+                    cursorColor: Colors.black,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      fillColor: Color(0xFFE7E3E3),
+                      filled: true,
+                      border: InputBorder.none,
+                      hintText: " +91",
+                      prefixStyle: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   )
                 ],
@@ -261,71 +241,22 @@ class _NewPatientState extends State<NewPatient>
                       )
                     ],
                   ),
-                  Container(
-                    height: height * 7 / 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(deviceWidth! * .01),
-                      color: const Color(0xFFE7E3E3),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: TextField(
-                        controller: ageTextEditing,
-                        cursorColor: Colors.black,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Patient age",
-                            hintStyle: TextStyle(
-                                fontSize: width * 3.9 / 100,
-                                color: const Color(0xFFC0C0C0))),
-                      ),
-                    ),
+                  TextField(
+                    maxLength: 2,
+                    controller: ageTextEditing,
+                    cursorColor: Colors.black,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                        filled: true,
+                        fillColor: const Color(0xFFE7E3E3),
+                        border: InputBorder.none,
+                        hintText: "Patient age",
+                        hintStyle: TextStyle(
+                            fontSize: width * 3.9 / 100,
+                            color: const Color(0xFFC0C0C0))),
                   )
                 ],
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 10, bottom: 5),
-                  child: Text(
-                    "Test*",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: width * 3.9 / 100),
-                  ),
-                )
-              ],
-            ),
-            Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(deviceWidth! * .01),
-                  // Set border radius
-                  color: const Color(0xFFE7E3E3), // Set fill color
-                ),
-                child: Obx(
-                  () => CustomMultiSelectField<String>(
-                    decoration: InputDecoration(
-                      suffixText: "$totalPrice ₹",
-                      border: InputBorder.none, // Set border to none
-                      filled: true,
-                      fillColor:
-                          Colors.transparent, // Set transparent fill color
-                    ),
-                    selectedItemColor: Colors.red,
-                    title: "Test",
-                    items: testMenuController.testMenuList
-                        .map((e) => e.testName)
-                        .toList(),
-                    enableAllOptionSelect: true,
-                    onSelectionDone: _onCountriesSelectionComplete,
-                    itemAsString: (item) => item.toString(),
-                  ),
-                )),
-            SizedBox(
-              height: deviceHeight! * .02,
             ),
             SizedBox(
               height: height * 13 / 100,
@@ -381,6 +312,140 @@ class _NewPatientState extends State<NewPatient>
                 ],
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10, bottom: 5),
+                  child: Text(
+                    "Samples*",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: width * 3.9 / 100),
+                  ),
+                )
+              ],
+            ),
+            InkWell(
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) {
+                    return Container(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        // Set column height to minimum
+                        children: [
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: testMenuController.testMenuList.length,
+                              itemBuilder: (context, index) {
+                                return Column(
+                                  children: [
+                                    ListTile(
+                                      leading: Image.network(
+                                        testMenuController
+                                            .testMenuList[index].imageUrl,
+                                        width: deviceWidth! * 0.1,
+                                        height: deviceWidth! * 0.1,
+                                      ),
+                                      title: Text(
+                                        testMenuController
+                                            .testMenuList[index].testSampleName,
+                                        style: GoogleFonts.acme(
+                                          fontSize: deviceWidth! * 0.05,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 1,
+                                        ),
+                                      ),
+                                      trailing: Checkbox(
+                                        value: false,
+                                        onChanged: (value) {
+                                          // Handle checkbox change here
+                                        },
+                                      ),
+                                    ),
+                                    Divider(), // Add a divider between items
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                          // "Done" button
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              SizedBox(
+                                width: deviceWidth!*.3,
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                    shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(deviceWidth!*.01)
+                                    )),
+                                      backgroundColor:
+                                          const MaterialStatePropertyAll(Colors.black)),
+                                  onPressed: () {
+                                    Navigator.pop(
+                                        context); // Close the bottom sheet
+                                  },
+                                  child: Text("Done",style: GoogleFonts.acme(color:Colors.white),),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(deviceWidth! * .01),
+                  // Set border radius
+                  color: const Color(0xFFE7E3E3), // Set fill color
+                ),
+                height: height * .07,
+              ),
+            ),
+            SizedBox(
+              height: deviceHeight! * .03,
+            ),
+            SizedBox(
+              height: height * 13 / 100,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10, bottom: 5),
+                        child: Text(
+                          "Enter Price*",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: width * 3.9 / 100),
+                        ),
+                      )
+                    ],
+                  ),
+                  TextFormField(
+                    maxLength: 10,
+                    controller: priceController,
+                    cursorColor: Colors.black,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      fillColor: Color(0xFFE7E3E3),
+                      filled: true,
+                      border: InputBorder.none,
+                      suffixIcon: Icon(Icons.currency_rupee_outlined),
+                      prefixStyle: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+            ),
             Column(
               children: [
                 Row(
@@ -389,7 +454,7 @@ class _NewPatientState extends State<NewPatient>
                     Padding(
                       padding: const EdgeInsets.only(left: 10, bottom: 5),
                       child: Text(
-                        "Voice Description",
+                        "Voice Message",
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: width * 3.9 / 100),
@@ -457,35 +522,5 @@ class _NewPatientState extends State<NewPatient>
         ),
       ),
     );
-  }
-
-  void _onCountriesSelectionComplete(value) {
-    if (kDebugMode) {
-      print(value.toString());
-    }
-
-    // Get the list of selected test names
-    List<String> selectedTestNames = List.from(value);
-
-    // Clear the selected test menu
-    selectedTestMenu.clear();
-
-    // Reset the total price to zero
-    totalPrice = 0;
-
-    // Iterate over each test menu model
-    testMenuController.testMenuList.forEach((TestMenuModel testMenuModel) {
-      // Check if the test name is selected
-      if (selectedTestNames.contains(testMenuModel.testName)) {
-        // Add the test menu model to the selected test menu
-        selectedTestMenu.add(testMenuModel);
-
-        // Add the price to the total price
-        totalPrice += int.parse(testMenuModel.testPrice);
-      }
-    });
- NewPatient.tests=selectedTestNames;
-    // Trigger a UI update
-    setState(() {});
   }
 }

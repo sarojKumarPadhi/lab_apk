@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -9,9 +12,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:jonk_lab/component/checkLatestRide.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/global/globalData.dart';
+import 'package:jonk_lab/page/after_ride_accept_by_rider.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:uuid/uuid.dart';
@@ -52,18 +55,28 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
   Timer? _timer;
   String? uId;
   bool? isRideBook;
+  String? otp;
+  StreamSubscription<dynamic>? _geofireSubscription;
 
   Set<Marker> driversMarkerSet = <Marker>{};
 
-  checkRide() async {
-    isRideBook = await checkLatestRide();
-    setState(() {});
+  // checkRide() async {
+  //   isRideBook = await checkLatestRide();
+  //   setState(() {});
+  // }
+
+
+  generateOtp() {
+    Random random = Random();
+    int generatedOtp = random.nextInt(900000) + 100000;
+    otp = generatedOtp.toString();
+    print("this is otp : ${otp!}");
   }
 
   @override
   void initState() {
     initializeGeofireListener();
-    checkRide();
+    generateOtp();
     super.initState();
     getPolyline();
     createCustomMarker();
@@ -80,12 +93,15 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
   }
 
   sendDataInRealTimeDataBase() async {
-    // DatabaseReference ref = FirebaseDatabase.instance.ref();
-    DatabaseReference ref = FirebaseDatabase.instance.ref("active_labs/$uId");
+    String? deviceToken=await FirebaseMessaging.instance.getToken();
+    String currentUid = FirebaseAuth.instance.currentUser!.uid;
+    DatabaseReference ref =
+        FirebaseDatabase.instance.ref("active_labs/$currentUid/$uId");
     latestRideId = uId!;
     await ref.set({
       "rideStatus": "idle",
       "labDetails": {
+        "deviceToken": deviceToken!,
         "labName": labBasicDetailsController
             .labBasicDetailsData.value.basicDetails!.labName,
         "labLocation": labBasicDetailsController
@@ -93,7 +109,7 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
         "latitude": labBasicDetailsController
             .labBasicDetailsData.value.address!.geoPoint.latitude,
         "longitude": labBasicDetailsController
-            .labBasicDetailsData.value.address!.geoPoint.latitude
+            .labBasicDetailsData.value.address!.geoPoint.longitude
       },
       "patientDetails": {
         "latitude": NewPatient.latLng?.latitude,
@@ -102,13 +118,19 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
         "phone": NewPatient.mobileNumber,
         "age": NewPatient.age,
         "test": NewPatient.tests,
-        "location": NewPatient.patientLocation
+        "location": NewPatient.patientLocation,
+        "totalDistance": totalDistance,
+        "totalPrice": totalPrice,
+        "otp": otp!
       },
-    }).then((value) {
+    }).then((value) async {
       List<String> devicesTokens =
           pushNotificationController.deviceToken.toSet().toList();
       pushNotificationService.sendPushNotification(
-          tokens: devicesTokens, rideRequestId: latestRideId!);
+          tokens: devicesTokens,
+          rideRequestId: latestRideId!,
+          labUid: currentUid);
+      HomePageState.sendOTP(otp!);
     });
   }
 
@@ -135,6 +157,9 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
             LatLng(NewPatient.latLng!.latitude, NewPatient.latLng!.longitude));
 
     if (directionInfoDetails != null) {
+      /// initialize total distance in global variable
+      totalDistance = directionInfoDetails.distance_value;
+
       PolylinePoints polylinePoints = PolylinePoints();
       List<PointLatLng> linePoints =
           polylinePoints.decodePolyline(directionInfoDetails.e_points!);
@@ -159,6 +184,7 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
     _timer?.cancel();
     _scrollController.dispose();
     super.dispose();
+    _geofireSubscription?.cancel();
   }
 
   @override
@@ -395,10 +421,12 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
                                         title:
                                             "Are you sure you want to cancel",
                                         onConfirmBtnTap: () async {
+                                          String labUid = FirebaseAuth
+                                              .instance.currentUser!.uid;
                                           await FirebaseDatabase.instance
                                               .ref()
                                               .child(
-                                                  "active_labs/$latestRideId")
+                                                  "active_labs/$labUid/$latestRideId")
                                               .remove()
                                               .then((value) {
                                             Get.offAll(() => const HomePage());
@@ -523,7 +551,7 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
 
   initializeGeofireListener() async {
     Geofire.initialize("activeDrivers");
-    Geofire.queryAtLocation(
+    _geofireSubscription=  Geofire.queryAtLocation(
             NewPatient.latLng!.latitude, NewPatient.latLng!.longitude, 10)!
         .listen((map) {
       if (map != null) {
@@ -599,13 +627,13 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
-          title: Text(
+          title: const Text(
             'Confirm Exit',
             style: TextStyle(
               fontWeight: FontWeight.bold,
             ),
           ),
-          content: Text(
+          content: const Text(
             'Are you sure you want to exit?',
             style: TextStyle(
               fontSize: 16.0,
@@ -616,7 +644,7 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text(
+              child: const Text(
                 'Cancel',
                 style: TextStyle(
                   color: Colors.grey,
@@ -650,4 +678,6 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
       },
     );
   }
+
+
 }

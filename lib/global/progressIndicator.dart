@@ -10,9 +10,6 @@ import 'globalData.dart';
 /// -------------------progress dialog ----------------//
 
 
-
-
-
 class CircularProgress extends StatelessWidget {
   const CircularProgress({super.key});
 

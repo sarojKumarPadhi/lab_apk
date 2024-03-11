@@ -12,63 +12,40 @@ class TestMenuController extends GetxController {
     getTestList();
   }
 
-  addTestMenu(String testName, String testSample, String testPrice) async {
-    String auth = FirebaseAuth.instance.currentUser!.uid;
-    await FirebaseFirestore.instance
-        .collection("lab")
-        .doc(auth)
-        .get()
-        .then((DocumentSnapshot snapshot) async {
-      if (snapshot.exists) {
-        Map<String, dynamic> mapData = snapshot.data() as Map<String, dynamic>;
-        List<dynamic> testList = mapData["test"] ?? [];
-        testList.add({
-          "testPrice": testPrice,
-          "testSampleName": testSample,
-          "testName": testName
-        });
-        await FirebaseFirestore.instance
-            .collection("lab")
-            .doc(auth)
-            .update({"test": testList});
-      }
-    });
-  }
+
 
   getTestList() async {
-    String auth = FirebaseAuth.instance.currentUser!.uid;
-    FirebaseFirestore.instance
-        .collection("lab")
-        .doc(auth)
-        .snapshots()
-        .listen((event) {
-      if (event.exists) {
-        Map<String, dynamic> mapData = event.data() as Map<String, dynamic>;
-        List<dynamic> testList = mapData["test"] ?? [];
-        testMenuList.value =
-            testList.map((e) => TestMenuModel.fromJson(e)).toList();
-      }
-    });
-  }
-
-  deleteTestMenu(int index) async {
-    List<TestMenuModel> newList = List.from(testMenuList); // Create a new list
-
-    newList.removeAt(index); // Remove item from the new list
-
-    String auth = FirebaseAuth.instance.currentUser!.uid;
+    String auth = "6JedNJxfiaSrVtey9wk9cjGEIrp2";
     await FirebaseFirestore.instance
-        .collection("lab")
+        .collection("admin")
         .doc(auth)
+        .collection("samples")
         .get()
-        .then((DocumentSnapshot snapshot) async {
-      if (snapshot.exists) {
-        await FirebaseFirestore.instance
-            .collection("lab")
-            .doc(auth)
-            .update({"test": newList.map((e) => e.toJson()).toList()}); // Convert list to JSON before updating
+        .then((QuerySnapshot snapshot) {
+      for (DocumentSnapshot snapshot in snapshot.docs) {
+        Map<String, dynamic> mapData = snapshot.data() as Map<String, dynamic>;
+        testMenuList.add(TestMenuModel.fromJson(mapData));
       }
     });
   }
 
+// deleteTestMenu(int index) async {
+//   List<TestMenuModel> newList = List.from(testMenuList); // Create a new list
+//
+//   newList.removeAt(index); // Remove item from the new list
+//
+//   String auth = FirebaseAuth.instance.currentUser!.uid;
+//   await FirebaseFirestore.instance
+//       .collection("lab")
+//       .doc(auth)
+//       .get()
+//       .then((DocumentSnapshot snapshot) async {
+//     if (snapshot.exists) {
+//       await FirebaseFirestore.instance
+//           .collection("lab")
+//           .doc(auth)
+//           .update({"test": newList.map((e) => e.toJson()).toList()}); // Convert list to JSON before updating
+//     }
+//   });
+// }
 }

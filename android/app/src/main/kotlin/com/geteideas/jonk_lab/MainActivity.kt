@@ -21,11 +21,14 @@ class MainActivity : FlutterActivity() {
                 "sendSms" -> {
                     val arguments = call.arguments as? Map<String, String>
                     val number = arguments?.get("number")
-                    val message = "Hello, this is a test SMS from Flutter!" // Replace with your message
+                    val otp = arguments?.get("otp")
+//                    val totalPrice = arguments?.get("totalPrice")
+                    val message = "Jonk : Share This OTP $otp to Your Lab Sample Collecter Only and total price is  ₹" // Replace with your message
                     if (number != null) {
                         sendSms(number, message)
+                        result.success("SMS sent successfully.")
                     }
-                    result.success("SMS sent successfully.")
+
                 }
                 else -> result.notImplemented()
             }

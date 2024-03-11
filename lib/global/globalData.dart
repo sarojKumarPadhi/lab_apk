@@ -9,15 +9,22 @@ double registrationPercentage = 0.15;
 double? deviceWidth;
 double? deviceHeight;
 String? latestRideId;
+int? totalDistance;
+int totalPrice=0;
+
 
 
 Map<String, List<String>> stateData = {
   "state": [
+    'Andaman and Nicobar Islands',
     'Andhra Pradesh',
     'Arunachal Pradesh',
     'Assam',
     'Bihar',
     'Chhattisgarh',
+    'Chandigarh',
+    'Dadra and Nagar Haveli and Daman and Diu',
+    'Delhi',
     'Goa',
     'Gujarat',
     'Haryana',
@@ -25,6 +32,8 @@ Map<String, List<String>> stateData = {
     'Jharkhand',
     'Karnataka',
     'Kerala',
+    'Ladakh',
+    'Lakshadweep',
     'Madhya Pradesh',
     'Maharashtra',
     'Manipur',
@@ -32,6 +41,7 @@ Map<String, List<String>> stateData = {
     'Mizoram',
     'Nagaland',
     'Odisha',
+    'Puducherry',
     'Punjab',
     'Rajasthan',
     'Sikkim',
@@ -41,14 +51,6 @@ Map<String, List<String>> stateData = {
     'Uttar Pradesh',
     'Uttarakhand',
     'West Bengal',
-    'Andaman and Nicobar Islands',
-    'Chandigarh',
-    'Dadra and Nagar Haveli and Daman and Diu',
-    'Lakshadweep',
-    'Delhi',
-    'Puducherry',
-    'Ladakh',
-    'Lakshadweep'
   ],
   'Andhra Pradesh': [
     'Anantapur',
@@ -66,27 +68,23 @@ Map<String, List<String>> stateData = {
     'Y.S.R. Kadapa (Cuddapah)'
   ],
   'Arunachal Pradesh': [
-    'Tawang',
-    'West Kameng',
-    'East Kameng',
-    'Papum Pare',
-    'Kurung Kumey',
-    'Kra Daadi',
-    'Lower Subansiri',
-    'Upper Subansiri',
-    'West Siang',
-    'East Siang',
-    'Siang',
-    'Upper Siang',
-    'Lower Siang',
-    'Lower Dibang Valley',
-    'Dibang Valley',
     'Anjaw',
-    'Lohit',
-    'Namsai',
     'Changlang',
+    'Dibang Valley',
+    'East Kameng',
+    'East Siang',
+    'Kurung Kumey',
+    'Lohit',
+    'Longding',
+    'Lower Dibang Valley',
+    'Lower Siang',
+    'Lower Subansiri',
+    'Namsai',
+    'Papum Pare',
+    'Siang',
+    'Tawang',
     'Tirap',
-    'Longding'
+    'Upper Siang', 'Upper Subansiri', 'West Kameng', 'West Siang'
   ],
   'Assam': [
     'Baksa',
@@ -460,17 +458,8 @@ Map<String, List<String>> stateData = {
     'West Khasi Hills'
   ],
   'Mizoram': [
-    'Aizawl',
-    'Lunglei',
-    'Saiha',
-    'Champhai',
-    'Serchhip',
-    'Kolasib',
-    'Lawngtlai',
-    'Mamit',
-    'Hnahthial',
-    'Khawzawl',
-    'Saitual',
+    'Aizawl', 'Champhai', 'Hnahthial', 'Khawzawl', 'Kolasib', 'Lawngtlai',
+    'Lunglei', 'Mamit', 'Saiha', 'Saitual', 'Serchhip'
   ],
   'Nagaland': [
     'Dimapur',

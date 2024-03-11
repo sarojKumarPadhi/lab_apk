@@ -55,54 +55,71 @@ class _UserRegistration3State extends State<UserRegistration3> {
   Future<void> bankNameAlert(
     BuildContext context,
   ) async {
-    return showDialog<void>(
+    return showGeneralDialog<void>(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Select Bank',
-              style:
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Builder(
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(deviceWidth!*.01)
+              ),
+              title: const Text('Select Bank',
+                  style:
                   TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: bankNameList.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    ListTile(
-                      title: Text(bankNameList[index]),
-                      onTap: () {
-                        setState(() {
-                          bankName.text = bankNameList[index];
-                        });
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    const Divider()
-                  ],
-                );
-              },
-            ),
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-              style: ButtonStyle(
-                  backgroundColor:
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: bankNameList.length,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        ListTile(
+                          title: Text(bankNameList[index]),
+                          onTap: () {
+                            setState(() {
+                              bankName.text = bankNameList[index];
+                            });
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        const Divider()
+                      ],
+                    );
+                  },
+                ),
+              ),
+              actions: <Widget>[
+                ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
                       const MaterialStatePropertyAll<Color>(Colors.black),
-                  shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5)))),
-              onPressed: () {
-                Navigator.of(context)
-                    .pop(); // Close the dialog without selecting any item
-              },
-              child: const Text('Cancel',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-          ],
+                      shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5)))),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(); // Close the dialog without selecting any item
+                  },
+                  child: const Text('Cancel',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
         );
       },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+           return ZoomIn(
+          child: child,
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 300),
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: Colors.black.withOpacity(0.5),
+      useRootNavigator: true,
     );
   }
 

@@ -140,7 +140,7 @@ class _UserRegistrationState extends State<UserRegistration> {
                           () {
                             Get.to(() => const UserRegistration1(),
                                     duration: const Duration(milliseconds: 400),
-                                    transition: Transition.leftToRight)
+                                    transition: Transition.circularReveal)
                                 ?.then((value) {
                               Navigator.pop(context);
                             });

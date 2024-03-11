@@ -54,109 +54,143 @@ class _UserRegistration1State extends State<UserRegistration1> {
   }
 
   Future<void> stateAlert(BuildContext context) async {
-    return showDialog<void>(
+    return showGeneralDialog<void>(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          title: const Text('Select State',
-              style: TextStyle(
-                  color: Colors.black87, fontWeight: FontWeight.bold)),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: stateData['state']!.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    ListTile(
-                      title: Text(stateData['state']![index]),
-                      onTap: () {
-                        setState(() {
-                          state.text = stateData['state']![index];
-                        });
-                        Navigator.of(context)
-                            .pop(); // Close the dialog on item selection
-                      },
-                    ),
-                    const Divider()
-                  ],
-                );
-              },
-            ),
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-              style: ButtonStyle(
-                  backgroundColor:
-                      const MaterialStatePropertyAll<Color>(Colors.black),
-                  shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5)))),
-              onPressed: () {
-                Navigator.of(context)
-                    .pop(); // Close the dialog without selecting any item
-              },
-              child: const Text('Cancel',
+      pageBuilder: (BuildContext buildContext, Animation<double> animation,
+          Animation<double> secondaryAnimation) {
+        return Builder(
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(deviceWidth! * .01)),
+              backgroundColor: Colors.white,
+              title: const Text('Select State',
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-          ],
+                      color: Colors.black87, fontWeight: FontWeight.bold)),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: stateData['state']!.length,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        ListTile(
+                          title: Text(stateData['state']![index]),
+                          onTap: () {
+                            setState(() {
+                              state.text = stateData['state']![index];
+                            });
+                            Navigator.of(context)
+                                .pop(); // Close the dialog on item selection
+                          },
+                        ),
+                        const Divider()
+                      ],
+                    );
+                  },
+                ),
+              ),
+              actions: <Widget>[
+                ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          const MaterialStatePropertyAll<Color>(Colors.black),
+                      shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5)))),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(); // Close the dialog without selecting any item
+                  },
+                  child: const Text('Cancel',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
         );
       },
+      transitionBuilder: (BuildContext context, Animation<double> animation,
+          Animation<double> secondaryAnimation, Widget child) {
+        return ZoomIn(
+          child: child,
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 300),
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: Colors.black.withOpacity(0.5),
+      useRootNavigator: true,
     );
   }
 
-  Future<void> districtAlert(BuildContext context, String selectedState) async {
-    return showDialog<void>(
+  Future<Future<Object?>> districtAlert(
+      BuildContext context, String selectedState) async {
+    return showGeneralDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Select District',
-              style: TextStyle(
-                  color: Colors.black87, fontWeight: FontWeight.bold)),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: stateData[selectedState]!.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    ListTile(
-                      title: Text(stateData[selectedState]![index]),
-                      onTap: () {
-                        setState(() {
-                          district.text = stateData[selectedState]![index];
-                        });
-                        Navigator.of(context)
-                            .pop(); // Close the dialog on item selection
-                      },
-                    ),
-                    const Divider()
-                  ],
-                );
-              },
-            ),
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-              style: ButtonStyle(
-                  backgroundColor:
-                      const MaterialStatePropertyAll<Color>(Colors.black),
-                  shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5)))),
-              onPressed: () {
-                Navigator.of(context)
-                    .pop(); // Close the dialog without selecting any item
-              },
-              child: const Text('Cancel',
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Builder(
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(deviceWidth!*.01)
+              ),
+              title: const Text('Select District',
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-          ],
+                      color: Colors.black87, fontWeight: FontWeight.bold)),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: stateData[selectedState]!.length,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        ListTile(
+                          title: Text(stateData[selectedState]![index]),
+                          onTap: () {
+                            setState(() {
+                              district.text = stateData[selectedState]![index];
+                            });
+                            Navigator.of(context)
+                                .pop(); // Close the dialog on item selection
+                          },
+                        ),
+                        const Divider()
+                      ],
+                    );
+                  },
+                ),
+              ),
+              actions: <Widget>[
+                ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          const MaterialStatePropertyAll<Color>(Colors.black),
+                      shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5)))),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(); // Close the dialog without selecting any item
+                  },
+                  child: const Text('Cancel',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
         );
       },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return ZoomIn(child: child);
+      },
+      transitionDuration: const Duration(milliseconds: 300),
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: Colors.black.withOpacity(0.5),
+      useRootNavigator: true,
     );
   }
 

@@ -60,40 +60,40 @@ class _LabProfilePageState extends State<LabProfilePage> {
                         )
                 ],
               ),
-              const Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Test Menu",
-                    style: GoogleFonts.acme(
-                        color: Colors.black, fontSize: deviceWidth! * .05),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Get.to(() => const TestMenuPage());
-                    },
-                    child: const Icon(Icons.menu_open),
-                  )
-                ],
-              ),
-              const Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Set Ride Price",
-                    style: GoogleFonts.acme(
-                        color: Colors.black, fontSize: deviceWidth! * .05),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Get.to(() =>  SetRidePrice());
-                    },
-                    child: const Icon(Icons.electric_bike),
-                  )
-                ],
-              ),
+              // const Divider(),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     Text(
+              //       "Test Menu",
+              //       style: GoogleFonts.acme(
+              //           color: Colors.black, fontSize: deviceWidth! * .05),
+              //     ),
+              //     ElevatedButton(
+              //       onPressed: () {
+              //         Get.to(() => const TestMenuPage());
+              //       },
+              //       child: const Icon(Icons.menu_open),
+              //     )
+              //   ],
+              // ),
+              // const Divider(),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     Text(
+              //       "Set Ride Price",
+              //       style: GoogleFonts.acme(
+              //           color: Colors.black, fontSize: deviceWidth! * .05),
+              //     ),
+              //     ElevatedButton(
+              //       onPressed: () {
+              //         Get.to(() =>  SetRidePrice());
+              //       },
+              //       child: const Icon(Icons.electric_bike),
+              //     )
+              //   ],
+              // ),
               const Divider(),
               Text(
                 'Lab Details',
