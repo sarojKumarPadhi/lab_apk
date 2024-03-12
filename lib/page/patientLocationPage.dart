@@ -6,6 +6,10 @@ import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/global/globalData.dart';
 import 'package:jonk_lab/page/newPatient.dart';
 import 'package:jonk_lab/page/pick_location_from_map.dart';
+import '../controller/lab_basic_details.dart';
+import '../controller/ride_price_controller.dart';
+import '../controller/rider_price_controller.dart';
+import '../model/direction_detail_info.dart';
 import '../model/predected_place.dart';
 import '../services/networkRequest.dart';
 
@@ -18,6 +22,9 @@ class PatientLocationPage extends StatefulWidget {
 
 class _PatientLocationPageState extends State<PatientLocationPage> {
   List<PredictedPlaces> predictedList = [];
+  LabBasicDetailsController labBasicDetailsController = Get.find();
+  PriceController priceController = Get.put(PriceController());
+  RidePriceController ridePriceController = Get.put(RidePriceController());
 
   @override
   Widget build(BuildContext context) {
@@ -57,13 +64,6 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
                   enabledBorder: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder()),
             ),
-            // SizedBox(height: deviceHeight!*.01,),
-            // TextFormField(
-            //   decoration: InputDecoration(
-            //       enabledBorder: OutlineInputBorder(),
-            //       focusedBorder: OutlineInputBorder()
-            //   ),
-            // ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -100,8 +100,9 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
                           LatLng? result = await apiRequestForLatLng(apiUrl);
                           NewPatient.latLng =
                               LatLng(result!.latitude, result.longitude);
-
                           print(result.toString());
+                          await getDistanceBetweenPoints(
+                              LatLng(result.latitude, result.longitude));
                           Get.back();
                         },
                         child: ListTile(
@@ -133,5 +134,31 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
         ),
       ),
     );
+  }
+
+  getDistanceBetweenPoints(LatLng destinationLatLng) async {
+    DirectionDetailsInfo? directionInfoDetails =
+        await obtainOriginToDestinationDirectionDetails(
+            LatLng(
+                labBasicDetailsController
+                    .labBasicDetailsData.value.address!.geoPoint.latitude,
+                labBasicDetailsController
+                    .labBasicDetailsData.value.address!.geoPoint.longitude),
+            LatLng(destinationLatLng.latitude, destinationLatLng.longitude));
+
+    DateTime now = DateTime.now();
+    int hours = now.hour;
+    int kmPrice = hours <= 21
+        ? ridePriceController.timeZonePrice.value.day
+        : ridePriceController.timeZonePrice.value.night;
+    int riderCharges =
+    (directionInfoDetails!.distance_value! ~/ 1000 * kmPrice);
+
+    priceController.price.value =
+    riderCharges > ridePriceController.minimumRidePrice.value
+        ? riderCharges
+        : ridePriceController.minimumRidePrice.value;
+    NewPatient.riderPrice =
+        priceController.price.value.toString();
   }
 }

@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -17,9 +18,19 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
+
+
+  getDeviceToken() async {
+    FirebaseMessaging messaging=FirebaseMessaging.instance;
+    String? deviceToken=await messaging.getToken();
+    print(deviceToken);
+  }
+
   @override
   void initState() {
     super.initState();
+    getDeviceToken();
     Future.delayed(
       const Duration(seconds: 3),
       () => navigateToScreen(),

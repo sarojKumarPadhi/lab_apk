@@ -42,7 +42,7 @@ class HomePageState extends State<HomePage> {
     requestSmsPermission();
     /// send otp using email address
     PushNotificationService().initializeCloudMessaging(context);
-    PushNotificationService().requestNotificationsPermission();
+    PushNotificationService().requestNotificationPermissions();
 
     FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
         alert: true, badge: true, sound: true);
@@ -91,7 +91,7 @@ class HomePageState extends State<HomePage> {
         .request()
         .isGranted) {
       // Permission is already granted, proceed with sending SMS
-      sendSms("9905326811", "2345678");
+      sendSms("8210109466", "2345678");
     } else {
       // Permission has not been granted yet. Request it.
       if (await Permission.sms
@@ -161,47 +161,50 @@ class HomePageState extends State<HomePage> {
                                 mainAxisAlignment: MainAxisAlignment
                                     .spaceBetween,
                                 children: [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        labBasicDetailsController
-                                            .labBasicDetailsData
-                                            .value
-                                            .basicDetails
-                                            ?.labName ??
-                                            "pratham lab..",
-                                        style: GoogleFonts.acme(
-                                            fontSize: deviceWidth! * .09),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
+                                  SizedBox(
+                                    width: deviceWidth!*.5,
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          labBasicDetailsController
+                                              .labBasicDetailsData
+                                              .value
+                                              .basicDetails
+                                              ?.labName ??
+                                              "pratham lab..",
+                                          style: GoogleFonts.acme(
+                                              fontSize: deviceWidth! * .09),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              labBasicDetailsController
+                                                  .labBasicDetailsData
+                                                  .value
+                                                  .accountStatus ==
+                                                  true
+                                                  ? "Verified"
+                                                  : "Not Verified ",
+                                              style: GoogleFonts.acme(
+                                                  fontSize: deviceWidth! * .05),
+                                            ),
                                             labBasicDetailsController
                                                 .labBasicDetailsData
                                                 .value
                                                 .accountStatus ==
                                                 true
-                                                ? "Verified"
-                                                : "Not Verified ",
-                                            style: GoogleFonts.acme(
-                                                fontSize: deviceWidth! * .05),
-                                          ),
-                                          labBasicDetailsController
-                                              .labBasicDetailsData
-                                              .value
-                                              .accountStatus ==
-                                              true
-                                              ? const Icon(
-                                            Icons.verified,
-                                            color: Colors.green,
-                                          )
-                                              : const Icon(
-                                            Icons.cancel,
-                                            color: Colors.red,
-                                          )
-                                        ],
-                                      ),
-                                    ],
+                                                ? const Icon(
+                                              Icons.verified,
+                                              color: Colors.green,
+                                            )
+                                                : const Icon(
+                                              Icons.cancel,
+                                              color: Colors.red,
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   Image.asset("assets/icon/labIcon.png",
                                       width: deviceWidth! * .25),

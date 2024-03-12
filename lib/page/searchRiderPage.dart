@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -14,11 +13,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/global/globalData.dart';
-import 'package:jonk_lab/page/after_ride_accept_by_rider.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:uuid/uuid.dart';
-
 import '../controller/lab_basic_details.dart';
 import '../controller/push_notification_controller.dart';
 import '../controller/searching_rider_controller.dart';
@@ -65,7 +62,6 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
   //   setState(() {});
   // }
 
-
   generateOtp() {
     Random random = Random();
     int generatedOtp = random.nextInt(900000) + 100000;
@@ -93,14 +89,18 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
   }
 
   sendDataInRealTimeDataBase() async {
-    String? deviceToken=await FirebaseMessaging.instance.getToken();
+    String? deviceToken = await FirebaseMessaging.instance.getToken();
     String currentUid = FirebaseAuth.instance.currentUser!.uid;
     DatabaseReference ref =
         FirebaseDatabase.instance.ref("active_labs/$currentUid/$uId");
-    latestRideId = uId!;
+
+     latestRideId = uId!;
     await ref.set({
       "rideStatus": "idle",
       "labDetails": {
+        "phoneNumber": labBasicDetailsController
+            .labBasicDetailsData.value.phoneNumber
+            ?.replaceAll("+91", ""),
         "deviceToken": deviceToken!,
         "labName": labBasicDetailsController
             .labBasicDetailsData.value.basicDetails!.labName,
@@ -120,7 +120,8 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
         "test": NewPatient.tests,
         "location": NewPatient.patientLocation,
         "totalDistance": totalDistance,
-        "totalPrice": totalPrice,
+        "labPrice": NewPatient.testPrice,
+        "riderPrice": NewPatient.riderPrice,
         "otp": otp!
       },
     }).then((value) async {
@@ -551,7 +552,7 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
 
   initializeGeofireListener() async {
     Geofire.initialize("activeDrivers");
-    _geofireSubscription=  Geofire.queryAtLocation(
+    _geofireSubscription = Geofire.queryAtLocation(
             NewPatient.latLng!.latitude, NewPatient.latLng!.longitude, 10)!
         .listen((map) {
       if (map != null) {
@@ -678,6 +679,4 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
       },
     );
   }
-
-
 }

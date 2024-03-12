@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -12,10 +10,12 @@ import 'package:permission_handler/permission_handler.dart';
 import '../page/after_ride_accept_by_rider.dart';
 
 class PushNotificationService {
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
-  void requestNotificationsPermission() async {
-    NotificationSettings settings = await _firebaseMessaging.requestPermission(
+  ///-----------------------request notification permission -------------------
+  Future<void> requestNotificationPermissions() async {
+    NotificationSettings notificationSettings =
+        await firebaseMessaging.requestPermission(
       alert: true,
       announcement: true,
       badge: true,
@@ -24,89 +24,21 @@ class PushNotificationService {
       provisional: true,
       sound: true,
     );
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print("user granted permission");
-    } else if (settings.authorizationStatus ==
+    if (notificationSettings.authorizationStatus ==
+        AuthorizationStatus.authorized) {
+      print("notification settings is authorized");
+    } else if (notificationSettings.authorizationStatus ==
+        AuthorizationStatus.denied) {
+      print("notification settings is denied");
+    } else if (notificationSettings.authorizationStatus ==
         AuthorizationStatus.provisional) {
-      print("user granted provisional permission");
-    } else {
-      print("user denied permission");
+      print("notification settings is provisional");
     }
   }
 
-  ///--------------------Create the channel on the device for when app in foreground----------------
+// It is assumed that all messages contain a data field with the key 'type'
 
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-
-  initLocalNotifications() async {
-    var androidInitializationSettings =
-        const AndroidInitializationSettings('@mipmap/ic_launcher');
-    var iosInitializationSettings = const DarwinInitializationSettings();
-
-    var iniInitializationSettings = InitializationSettings(
-        android: androidInitializationSettings, iOS: iosInitializationSettings);
-    await flutterLocalNotificationsPlugin.initialize(
-      iniInitializationSettings,
-      onDidReceiveNotificationResponse: (payload) {},
-    );
-  }
-
-  ///---------this will be called when app is in background or terminated ///
-
-  void firebaseInit() async {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print(message.notification!.title.toString());
-      print(message.notification!.body.toString());
-      showNotification(message);
-    });
-  }
-
-  ///--------show the notification/
-
-  Future showNotification(RemoteMessage message) async {
-    AndroidNotificationChannel channel = AndroidNotificationChannel(
-      Random.secure().nextInt(100000).toString(), // id
-      'High Importance Notifications', // title
-      importance: Importance.max,
-    );
-
-    AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(
-            channel.id.toString(), channel.name.toString(),
-            channelDescription: 'your channel description',
-            importance: Importance.high,
-            priority: Priority.high,
-            ticker: 'ticker');
-
-    DarwinNotificationDetails darwinNotificationDetails =
-        const DarwinNotificationDetails(
-      presentSound: true,
-      presentBadge: true,
-      presentAlert: true,
-    );
-
-    NotificationDetails notificationDetails = NotificationDetails(
-        android: androidNotificationDetails, iOS: darwinNotificationDetails);
-    Future.delayed(
-      Duration.zero,
-      () {
-        flutterLocalNotificationsPlugin.show(0, message.notification!.title,
-            message.notification!.body, notificationDetails);
-      },
-    );
-  }
-
-  /// --------------------it is used for to get device token----------
-
-  Future<String?> getDeviceToken() async {
-    String? token = await _firebaseMessaging.getToken();
-    print(
-        "This is your device token===================================== :- \n$token");
-    return token;
-  }
-
+  ///------------------send push notification------------------------
   Future<void> sendPushNotification(
       {required List<String> tokens,
       required String rideRequestId,
@@ -162,31 +94,50 @@ class PushNotificationService {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   Future initializeCloudMessaging(BuildContext context) async {
+
+
+
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage? remoteMessage) {
       if (remoteMessage != null) {
         print("This is a remote message ");
         print(remoteMessage.data);
+
+        if (remoteMessage.data["notificationType"] == "ride") {
+          readLabRideRequestInformation(remoteMessage.data["rideRequestId"],
+              context, remoteMessage.data["labUid"]);
+        }
+        print("App opened from background with notification");
+        print(remoteMessage.data);
+      }
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage remoteMessage) {
+
+
+      print("App opened from background with notification");
+      print(remoteMessage.data);
+      if (remoteMessage.data["notificationType"] == "ride") {
         readLabRideRequestInformation(remoteMessage.data["rideRequestId"],
             context, remoteMessage.data["labUid"]);
       }
     });
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage remoteMessage) {
-      readLabRideRequestInformation(remoteMessage.data["rideRequestId"],
-          context, remoteMessage.data["labUid"]);
-    });
-
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage remoteMessage) {
-      readLabRideRequestInformation(remoteMessage.data["rideRequestId"],
-          context, remoteMessage.data["labUid"]);
+
+      print("App opened from background with notification");
+      print(remoteMessage.data);
+      if (remoteMessage.data["notificationType"] == "ride") {
+        readLabRideRequestInformation(remoteMessage.data["rideRequestId"],
+            context, remoteMessage.data["labUid"]);
+      }
     });
   }
 
   readLabRideRequestInformation(
       String requestId, BuildContext context, String labUid) {
-    Get.offAll(() =>
-        AfterAcceptanceRidePage(requestId: requestId, labUid: labUid));
+    Get.offAll(
+        () => AfterAcceptanceRidePage(requestId: requestId, labUid: labUid));
   }
 }

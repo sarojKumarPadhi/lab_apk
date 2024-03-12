@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:jonk_lab/controller/lab_basic_details.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/page/newPatient.dart';
 
+import '../controller/ride_price_controller.dart';
+import '../controller/rider_price_controller.dart';
+import '../model/direction_detail_info.dart';
+import '../services/networkRequest.dart';
 
 class PickLocationFromMap extends StatefulWidget {
   const PickLocationFromMap({Key? key}) : super(key: key);
@@ -22,6 +27,9 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
   String? pinCode;
   String? administrativeArea;
   String? subAdministrativeArea;
+  PriceController priceController = Get.put(PriceController());
+  LabBasicDetailsController labBasicDetailsController = Get.find();
+  RidePriceController ridePriceController = Get.put(RidePriceController());
 
   @override
   void initState() {
@@ -70,11 +78,14 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
                     ),
             },
             onMapCreated: (GoogleMapController controller) {},
-            onTap: (LatLng location) {
+            onTap: (LatLng location) async {
               setState(() {
                 _pickedLocation = location;
-                NewPatient.latLng=location;
+                NewPatient.latLng = location;
               });
+              await getDistanceBetweenPoints(
+                  LatLng(location.latitude, location.longitude));
+
               latLngToAddress(location);
             },
           ),
@@ -119,11 +130,12 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             ElevatedButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 NewPatient.patientLocation =
                                     "${street ?? ""}, ${subLocality ?? ""}, ${locality ?? ""}, ${administrativeArea ?? ""}, ${pinCode ?? ""}";
+
                                 // newSampleDataModel.latLng = _pickedLocation;
-                                Get.to(() =>  NewPatient());
+                                Get.to(() => NewPatient());
                               },
                               child: const Text("Confirm"),
                             )
@@ -149,5 +161,30 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
     administrativeArea = address.first.administrativeArea;
     subAdministrativeArea = address.first.subAdministrativeArea;
     setState(() {});
+  }
+
+  getDistanceBetweenPoints(LatLng destinationLatLng) async {
+    DirectionDetailsInfo? directionInfoDetails =
+        await obtainOriginToDestinationDirectionDetails(
+            LatLng(
+                labBasicDetailsController
+                    .labBasicDetailsData.value.address!.geoPoint.latitude,
+                labBasicDetailsController
+                    .labBasicDetailsData.value.address!.geoPoint.longitude),
+            LatLng(destinationLatLng.latitude, destinationLatLng.longitude));
+    DateTime now = DateTime.now();
+    int hours = now.hour;
+    int kmPrice = hours <= 21
+        ? ridePriceController.timeZonePrice.value.day
+        : ridePriceController.timeZonePrice.value.night;
+    int riderCharges =
+        (directionInfoDetails!.distance_value! ~/ 1000 * kmPrice);
+
+    priceController.price.value =
+        riderCharges > ridePriceController.minimumRidePrice.value
+            ? riderCharges
+            : ridePriceController.minimumRidePrice.value;
+    NewPatient.riderPrice =
+        priceController.price.value.toString();
   }
 }

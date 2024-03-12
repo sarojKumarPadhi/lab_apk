@@ -1,3 +1,9 @@
+
+
+
+
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LabBasicDetailsModel {
@@ -5,9 +11,7 @@ class LabBasicDetailsModel {
   Address? address;
   BankDetails? bankDetails;
   BasicDetails? basicDetails;
-  DocumentUrl? documentUrl;
   String? phoneNumber;
-  DocumentVerification? documentVerification;
   final String userId;
 
   LabBasicDetailsModel({
@@ -15,21 +19,17 @@ class LabBasicDetailsModel {
     this.basicDetails,
     this.address,
     this.bankDetails,
-    this.documentUrl,
     this.phoneNumber = "8210109466",
-    this.documentVerification,
     this.userId = "",
   });
 
   factory LabBasicDetailsModel.fromJson(Map<String, dynamic> json) {
     return LabBasicDetailsModel(
         basicDetails: BasicDetails.fromJson(json["basicDetails"]),
-        accountStatus: json["accountStatus"] ?? false,
-        address: Address.fromJson(json),
-        bankDetails: BankDetails.fromJson(json),
-        documentUrl: DocumentUrl.fromJson(json),
+        accountStatus: json ["accountStatus"] ?? false,
+        address: Address.fromJson(json["address"]),
+        bankDetails: BankDetails.fromJson(json["bankDetails"]),
         phoneNumber: json["phoneNumber"],
-        documentVerification: DocumentVerification.fromJson(json),
         userId: json["userUid"] ?? "");
   }
 }
@@ -45,24 +45,23 @@ class Address {
 
   Address(
       {required this.city,
-      required this.state,
-      required this.country,
-      required this.pinCode,
-      required this.district,
-      required this.labLocation,
-      required this.geoPoint});
+        required this.state,
+        required this.country,
+        required this.pinCode,
+        required this.district,
+        required this.labLocation,
+        required this.geoPoint});
 
   factory Address.fromJson(Map<String, dynamic> json) {
     GeoPoint defaultGeoPoint = const GeoPoint(30.7117829, 76.84531799999999);
 
     return Address(
-        city: json["city"] ?? "panchkula",
-        state: json["state"] ?? "haryana",
-        country: json["country"] ?? "india",
-        pinCode: json["pinCode"] ?? "841460",
-        district: json["district"] ?? "zirakpur",
-        labLocation: json["labLocation"] ??
-            "Pratham Clinical Laboratory And Diagnostic Centre NAC Manimajra, Manimajra, Chandigarh, India",
+        city: json["city"],
+        state: json["state"],
+        country: json["country"],
+        pinCode: json["pinCode"],
+        district: json["district"],
+        labLocation: json["labLocation"],
         geoPoint: json["latLong"] ?? defaultGeoPoint);
   }
 }
@@ -75,66 +74,20 @@ class BankDetails {
 
   BankDetails(
       {required this.accountNumber,
-      required this.bankName,
-      required this.branchName,
-      required this.ifscCode});
+        required this.bankName,
+        required this.branchName,
+        required this.ifscCode});
 
   factory BankDetails.fromJson(Map<String, dynamic> json) {
     return BankDetails(
-        accountNumber: json["accountNumber"] ?? "235689875421",
-        bankName: json["bankName"] ?? "Allahabad Bank",
-        branchName: json["branchName"] ?? "Allahabad main branch chapra",
-        ifscCode: json["ifscCode"] ?? "2356898");
+        accountNumber: json["accountNumber"],
+        bankName: json["bankName"],
+        branchName: json["branchName"],
+        ifscCode: json["ifscCode"]);
   }
 }
 
-class DocumentUrl {
-  final String aadharUrl;
-  final String bankPassBookUrl;
-  final String labCertificateUrl;
-  final String panCardUrl;
-  final List<String> labPictureUrl;
 
-  DocumentUrl(
-      {required this.aadharUrl,
-      required this.bankPassBookUrl,
-      required this.labCertificateUrl,
-      required this.panCardUrl,
-      required this.labPictureUrl});
-
-  factory DocumentUrl.fromJson(Map<String, dynamic> json) {
-    return DocumentUrl(
-        aadharUrl: json["aadharUrl"] ?? "",
-        bankPassBookUrl: json["bankPassBookUrl"] ?? "",
-        labCertificateUrl: json["labCertificateUrl"] ?? "",
-        panCardUrl: json["panCardUrl"] ?? "",
-        labPictureUrl: List.from(json["labPictureUrl"] ?? []));
-  }
-}
-
-class DocumentVerification {
-  final bool aadhar;
-  final bool bankPassbook;
-  final bool labCertificate;
-  final bool labPicture;
-  final bool panCard;
-
-  DocumentVerification(
-      {required this.aadhar,
-      required this.bankPassbook,
-      required this.labCertificate,
-      required this.labPicture,
-      required this.panCard});
-
-  factory DocumentVerification.fromJson(Map<String, dynamic> json) {
-    return DocumentVerification(
-        aadhar: json["aadhar"] ?? false,
-        bankPassbook: json["bankPassbook"] ?? false,
-        labCertificate: json["labCertificate"] ?? false,
-        labPicture: json["labPicture"] ?? false,
-        panCard: json["panCard"] ?? false);
-  }
-}
 
 class BasicDetails {
   final String labName;
@@ -143,8 +96,8 @@ class BasicDetails {
 
   BasicDetails(
       {this.labName = "Pratham lab",
-      this.labOwnerName = "Kumar Biswas",
-      this.labRegistrationNumber = "1234567"});
+        this.labOwnerName = "Kumar Biswas",
+        this.labRegistrationNumber = "1234567"});
 
   factory BasicDetails.fromJson(Map<String, dynamic> json) {
     return BasicDetails(

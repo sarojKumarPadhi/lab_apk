@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import '../model/time_price_zone.dart';
 
 class RidePriceController extends GetxController {
-  RxString minimumRidePrice = "".obs;
-  RxString perKmPrice = "".obs;
-
+  RxInt minimumRidePrice = 0.obs;
+  Rx<TimePriceZone> timeZonePrice = TimePriceZone(day: 0, night: 0).obs;
   @override
   void onInit() {
     getPrice();
@@ -15,26 +13,15 @@ class RidePriceController extends GetxController {
 
   getPrice() {
     FirebaseFirestore.instance
-        .collection("lab")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("admin")
+        .doc("6JedNJxfiaSrVtey9wk9cjGEIrp2")
         .get()
         .then((DocumentSnapshot snapshot) {
       if (snapshot.exists) {
         Map<String, dynamic> mapData = snapshot.data() as Map<String, dynamic>;
-        minimumRidePrice.value = mapData["minimumRidePrice"] ?? "0";
-        perKmPrice.value = mapData["perKmPrice"] ?? "0";
+        minimumRidePrice.value = mapData["minimumPrice"] ?? "0";
+        timeZonePrice.value = TimePriceZone.fromJson(mapData["timePrice"]);
       }
-    });
-  }
-
-  updateRate(String minRate, String perKmPrice) {
-    FirebaseFirestore.instance
-        .collection("lab")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .update({"minimumRidePrice": minRate, "perKmPrice": perKmPrice}).then(
-            (value) {
-      getPrice();
-      Fluttertoast.showToast(msg: "Updated price");
     });
   }
 }
