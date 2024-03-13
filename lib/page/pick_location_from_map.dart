@@ -60,34 +60,30 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
               zoom: 15,
               target: _pickedLocation,
             ),
-            markers: {
-              customMarker != null
-                  ? Marker(
-                      icon: customMarker!,
-                      markerId: const MarkerId('picked-location'),
-                      position: _pickedLocation,
-                      consumeTapEvents:
-                          true, // Fixed marker, won't respond to tap events
-                    )
-                  : Marker(
-                      icon: BitmapDescriptor.defaultMarker,
-                      markerId: const MarkerId('picked-location'),
-                      position: _pickedLocation,
-                      consumeTapEvents:
-                          true, // Fixed marker, won't respond to tap events
-                    ),
+            onCameraMove: (CameraPosition ? position) {
+            if(_pickedLocation != position!.target){
+                setState(() {
+                  _pickedLocation=position!.target;
+                });
+            }
             },
-            onMapCreated: (GoogleMapController controller) {},
-            onTap: (LatLng location) async {
-              setState(() {
-                _pickedLocation = location;
-                NewPatient.latLng = location;
-              });
+            onCameraIdle: () async {
+              NewPatient.latLng = _pickedLocation;
               await getDistanceBetweenPoints(
-                  LatLng(location.latitude, location.longitude));
-
-              latLngToAddress(location);
+                  LatLng(_pickedLocation.latitude, _pickedLocation.longitude));
+              latLngToAddress(_pickedLocation);
             },
+
+            onMapCreated: (GoogleMapController controller) { },
+
+          ),
+          Align(
+          alignment: Alignment.center,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 35),
+              child: Image.asset("assets/icon/pin.png",height: 35,width: 35,),
+            ),
+
           ),
           street != null
               ? Positioned(
