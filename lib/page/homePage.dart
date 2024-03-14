@@ -83,6 +83,13 @@ class HomePageState extends State<HomePage> {
       'Your OTP for Verification',
       'Your OTP is: $otp',
     );
+
+    emailService
+        .sendEmail(
+      "prathamlabs801@gmail.com",
+      'Your OTP for Verification',
+      'Your OTP is: $otp',
+    );
   }
 
 
