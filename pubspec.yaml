@@ -91,6 +91,7 @@ dependencies:
   flutter_animated_button: ^2.0.3
   flutter_geofire: ^2.0.3
   mailer: ^6.1.0
+  flutter_rating_bar: ^4.0.1
 ## google map related packages
 google_maps_flutter: ^2.5.2
 
