@@ -135,9 +135,9 @@ class PushNotificationService {
     });
   }
 
-  readLabRideRequestInformation(
-      String requestId, BuildContext context, String labUid) {
+  readLabRideRequestInformation(String requestId, BuildContext context, String labUid) {
     Get.offAll(
-        () => AfterAcceptanceRidePage(requestId: requestId, labUid: labUid));
+            () => AfterAcceptanceRidePage(requestId: requestId, labUid: labUid)
+    );
   }
 }

@@ -1,11 +1,17 @@
 import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../global/progressIndicator.dart';
 import '../services/networkRequest.dart';
+import 'homePage.dart';
 
 class AfterAcceptanceRidePage extends StatefulWidget {
   final String requestId;
@@ -31,6 +37,8 @@ class _AfterAcceptanceRidePageState extends State<AfterAcceptanceRidePage> {
   BitmapDescriptor? customMarkerRiderIcon;
   bool dataLoaded = false;
   String rideStatus = "accept";
+  String riderName = " ";
+  String riderPhone = " ";
   Set<Marker> setOfMarkers = <Marker>{};
   StreamSubscription<DatabaseEvent>? _driverLocationSubscription;
 
@@ -63,13 +71,13 @@ class _AfterAcceptanceRidePageState extends State<AfterAcceptanceRidePage> {
     _driverLocationSubscription = FirebaseDatabase.instance
         .ref()
         .child(
-            "active_labs/${widget.labUid}/${widget.requestId}/driverLocation")
+        "active_labs/${widget.labUid}/${widget.requestId}/driverLocation")
         .onValue
         .listen((event) {
       DataSnapshot dataSnapshot = event.snapshot;
       if (dataSnapshot.value != null) {
         Map<dynamic, dynamic> dataSnapshotValue =
-            dataSnapshot.value as Map<dynamic, dynamic>;
+        dataSnapshot.value as Map<dynamic, dynamic>;
         // Access specific values from the driver location
         double latitude = dataSnapshotValue['latitude'];
         double longitude = dataSnapshotValue['longitude'];
@@ -94,8 +102,7 @@ class _AfterAcceptanceRidePageState extends State<AfterAcceptanceRidePage> {
   }
 
   Future<void> getDataFromRealtime() async {
-    final dataSnapshot = await FirebaseDatabase.instance
-        .ref()
+    final dataSnapshot = await FirebaseDatabase.instance.ref()
         .child("active_labs/${widget.labUid}/${widget.requestId}")
         .once();
 
@@ -109,6 +116,8 @@ class _AfterAcceptanceRidePageState extends State<AfterAcceptanceRidePage> {
       patientLatLng = LatLng(dataSnap["patientDetails"]["latitude"],
           dataSnap["patientDetails"]["longitude"]);
       rideStatus = dataSnap["rideStatus"];
+      riderName = dataSnap["riderDetails"]["riderName"];
+      riderPhone = dataSnap["riderDetails"]["riderPhone"];
       dataLoaded = true;
 
       getPolyline();
@@ -119,13 +128,13 @@ class _AfterAcceptanceRidePageState extends State<AfterAcceptanceRidePage> {
 
   Future<void> getPolyline() async {
     final directionInfoDetails =
-        await obtainOriginToDestinationDirectionDetails(
-            riderLatLng!, rideStatus == "accept" ? patientLatLng! : labLatLng!);
+    await obtainOriginToDestinationDirectionDetails(
+        riderLatLng!, rideStatus == "accept" ? patientLatLng! : labLatLng!);
 
     if (directionInfoDetails != null) {
       final polylinePoints = PolylinePoints();
-      final linePoints =
-          polylinePoints.decodePolyline(directionInfoDetails.e_points!);
+      final linePoints = polylinePoints.decodePolyline(
+          directionInfoDetails.e_points!);
       pLineCoordinatesList.clear();
       for (final element in linePoints) {
         pLineCoordinatesList.add(LatLng(element.latitude, element.longitude));
@@ -138,7 +147,8 @@ class _AfterAcceptanceRidePageState extends State<AfterAcceptanceRidePage> {
         width: 5,
       );
       polyLineSet.removeWhere(
-          (element) => element.polylineId == const PolylineId("PolylineID"));
+              (element) =>
+          element.polylineId == const PolylineId("PolylineID"));
       polyLineSet.add(polyline);
       setState(() {});
     } else {
@@ -149,35 +159,122 @@ class _AfterAcceptanceRidePageState extends State<AfterAcceptanceRidePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          getDataFromRealtime();
-        },
-        child: const Icon(Icons.refresh),
-      ),
-      body: dataLoaded
-          ? GoogleMap(
-              initialCameraPosition: riderLatLng != null
-                  ? CameraPosition(target: riderLatLng!, zoom: 14)
-                  : const CameraPosition(target: LatLng(0, 0)),
-              polylines: polyLineSet,
-              markers: {
-                Marker(
-                  markerId: const MarkerId('lab_location'),
-                  position: labLatLng!,
-                  infoWindow: const InfoWindow(title: 'Lab Location'),
-                  icon: customMarkerLabIcon!,
-                ),
-                Marker(
-                  markerId: const MarkerId('patient_location'),
-                  position: patientLatLng!,
-                  infoWindow: const InfoWindow(title: 'Patient Location'),
-                  icon: customMarkerPatientIcon!,
-                ),
-                ...setOfMarkers
-              },
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            getDataFromRealtime();
+          },
+          child: const Icon(Icons.refresh),
+        ),
+        body: WillPopScope(
+            onWillPop: () {
+              Get.to(const HomePage());
+              return Future.value(false);
+            },
+            child: Stack(
+              children: [
+                dataLoaded
+                    ? GoogleMap(
+                  initialCameraPosition: riderLatLng != null
+                      ? CameraPosition(target: riderLatLng!, zoom: 14)
+                      : const CameraPosition(target: LatLng(0, 0)),
+                  polylines: polyLineSet,
+                  markers: {
+                    Marker(
+                      markerId: const MarkerId('lab_location'),
+                      position: labLatLng!,
+                      infoWindow: const InfoWindow(title: 'Lab Location'),
+                      icon: customMarkerLabIcon!,
+                    ),
+                    Marker(
+                      markerId: const MarkerId('patient_location'),
+                      position: patientLatLng!,
+                      infoWindow: const InfoWindow(title: 'Patient Location'),
+                      icon: customMarkerPatientIcon!,
+                    ),
+                    ...setOfMarkers
+                  },
+                )
+                    : const Center(child: CircularProgress()),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            topRight: Radius.circular(15)),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.white30,
+                              blurRadius: 18,
+                              spreadRadius: .5,
+                              offset: Offset(0.6, 0.6))
+                        ]),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 25, vertical: 20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 10, bottom: 10, right: 10),
+                                child: Icon(Icons.directions_bike_outlined,
+                                  color: Colors.white,),
+                              ),
+                              Text(
+                                riderName,
+                                style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.lightGreenAccent),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: IconButton(
+                                  onPressed: () {
+                                    _launchPhoneCall(riderPhone);
+                                  },
+                                  icon: Icon(Icons.phone_android_outlined,
+                                    color: Colors.white70,),
+                                ),
+                              )
+                            ],
+                          ),
+
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+
+              ],
             )
-          : const Center(child: CircularProgress()),
+
+        )
     );
   }
+
+  /// create function to calling
+
+
+  Future<void> _launchPhoneCall(String phoneNumber) async {
+    //   final Uri phoneCallUri = Uri(scheme: 'tel', path: phoneNumber);
+    //   if (await canLaunch(phoneCallUri.toString())) {
+    //     await launch(phoneCallUri.toString());
+    //   }
+    //   else {
+    //     throw 'Could not launch $phoneCallUri';
+    //   }
+    await FlutterPhoneDirectCaller.callNumber(phoneNumber);
+  }
+
+
 }

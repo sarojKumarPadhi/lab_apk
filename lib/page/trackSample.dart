@@ -1,6 +1,12 @@
 import 'package:colorful_safe_area/colorful_safe_area.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jonk_lab/global/color.dart';
+import 'package:jonk_lab/global/globalData.dart';
+import 'package:jonk_lab/page/after_ride_accept_by_rider.dart';
+
+import '../controller/track_sample_controller.dart';
 
 class TrackSample extends StatefulWidget {
   const TrackSample({Key? key}) : super(key: key);
@@ -10,8 +16,11 @@ class TrackSample extends StatefulWidget {
 }
 
 class _TrackSampleState extends State<TrackSample> {
+
+  trackSample trackSampleData=Get.put(trackSample());
   @override
   Widget build(BuildContext context) {
+
     var height = MediaQuery.of(context).size.height; //834
     var width = MediaQuery.of(context).size.width; //392
     return Scaffold(
@@ -57,110 +66,119 @@ class _TrackSampleState extends State<TrackSample> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 650,
+           Obx(() =>  SizedBox(
+             height: 650,
+             child: ListView.builder(
+               itemCount: trackSampleData.listOfSample.length,
+               itemBuilder: (BuildContext context, int index) {
+                 Map<dynamic,dynamic> data=  trackSampleData.listOfSample[index] as Map<dynamic,dynamic>;
 
-              child: ListView.builder(
-                itemCount: 1,
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(7),
-                    child: Container(
-                      height: 130,
-                      decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(
-                                  0, 3), // Offset (horizontal, vertical)
-                            ),
-                          ],
-                          color: Colors.white,
-                          borderRadius: const BorderRadius.all(Radius.circular(10))
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.only(
-                            left: 10, right: 10, top: 10),
-                        child: Column(
-                          children: [
+                 return Padding(
+                   padding: const EdgeInsets.all(7),
+                   child: InkWell(
+                     onTap: () {
+                       Get.to(AfterAcceptanceRidePage(requestId: data["requestId"], labUid: auth.toString()));
+                     },
+                     child: Container(
+                       decoration: BoxDecoration(
+                           boxShadow: [
+                             BoxShadow(
+                               color: Colors.black.withOpacity(0.1),
+                               spreadRadius: 5,
+                               blurRadius: 7,
+                               offset: const Offset(
+                                   0, 3), // Offset (horizontal, vertical)
+                             ),
+                           ],
+                           color: Colors.white,
+                           borderRadius: const BorderRadius.all(Radius.circular(10))
+                       ),
+                       child:  Padding(
+                         padding: EdgeInsets.only(
+                             left: 10, right: 10, top: 10),
+                         child: Column(
+                           children: [
 
-                            Row(
-                              children: [
-                                Icon(Icons.person, size: 25,
-                                  color: Colors.grey,),
-                                Text("Patient Name",
-                                  style: TextStyle(fontSize: 19),),
+                             Row(
+                               children: [
+                                 Icon(Icons.person, size: 25,
+                                   color: Colors.grey,),
+                                 Text(data["patientDetails"]["name"],
+                                   style: TextStyle(fontSize: 19),),
 
-                              ],
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(2),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.location_on, size: 20,
-                                    color: Colors.grey,),
-                                  Text(" Panchkula,Sector22",
-                                    style: TextStyle(fontSize: 15),)
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(2),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment
-                                    .spaceBetween,
-                                children: [
-                                  Row(children: [
-                                    Icon(Icons.directions_bike_rounded, size: 20,
-                                      color: Colors.grey,),
-                                    Text(" Abhishek kumar",
-                                      style: TextStyle(fontSize: 15),)
-                                  ]),
-                                  Row(children: [
+                               ],
+                             ),
+                             Padding(
+                               padding: EdgeInsets.all(2),
+                               child: Row(
+                                 children: [
+                                   Icon(Icons.location_on, size: 20,
+                                     color: Colors.grey,),
+                                   Expanded(
+                                     child: Text(data["patientDetails"]["location"],
+                                       style: TextStyle(fontSize: 15),),
+                                   )
+                                 ],
+                               ),
+                             ),
+                             Padding(
+                               padding: EdgeInsets.all(2),
+                               child: Row(
+                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                 children: [
+                                   Row(children: [
+                                     Icon(Icons.directions_bike_rounded, size: 20,
+                                       color: Colors.grey,),
+                                     Text(data["riderDetails"]["riderName"],
+                                       style: TextStyle(fontSize: 15),)
+                                   ]),
+                                   Row(children: [
 
-                                    Text("Balance", style: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold),)
-                                  ]),
+                                     Text("Balance", style: TextStyle(
+                                         fontSize: 17,
+                                         fontWeight: FontWeight.bold),)
+                                   ]),
 
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  right: 5, top: 0, left: 3),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment
-                                    .spaceBetween,
-                                children: [
-                                  Row(children: [
-                                    Icon(Icons.access_alarm, size: 20,
-                                      color: Colors.grey,),
-                                    Text(" 01:30",
-                                      style: TextStyle(fontSize: 15,color: Colors.red),)
-                                  ]),
-                                  Row(children: [
-                                    Icon(
-                                      Icons.currency_rupee_sharp, size: 17,
-                                      color: Colors.black,),
-                                    Text("2390", style: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold),)
-                                  ]),
+                                 ],
+                               ),
+                             ),
+                             Padding(
+                               padding: EdgeInsets.only(
+                                   right: 5, top: 0, left: 3),
+                               child: Row(
+                                 mainAxisAlignment: MainAxisAlignment
+                                     .spaceBetween,
+                                 children: [
+                                   Row(children: [
+                                     Icon(Icons.access_alarm, size: 20,
+                                       color: Colors.grey,),
+                                     Text(" 01:30",
+                                       style: TextStyle(fontSize: 15,color: Colors.red),)
+                                   ]),
+                                   Row(children: [
+                                     Icon(
+                                       Icons.currency_rupee_sharp, size: 17,
+                                       color: Colors.black,),
+                                     Text(data["patientDetails"]["labPrice"], style: TextStyle(
+                                         fontSize: 17,
+                                         fontWeight: FontWeight.bold),)
+                                   ]),
 
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            )
+                                 ],
+                               ),
+                             ),
+                           ],
+                         ),
+
+                       ),
+                     ),
+                   ),
+                 );
+               },
+
+             ),
+           )
+           )
           ],
         ),
       ),
