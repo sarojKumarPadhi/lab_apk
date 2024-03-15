@@ -37,8 +37,8 @@ class _AfterAcceptanceRidePageState extends State<AfterAcceptanceRidePage> {
   BitmapDescriptor? customMarkerRiderIcon;
   bool dataLoaded = false;
   String rideStatus = "accept";
-  String rideName = " ";
-  String ridePhone = " ";
+  String riderName = " ";
+  String riderPhone = " ";
   Set<Marker> setOfMarkers = <Marker>{};
   StreamSubscription<DatabaseEvent>? _driverLocationSubscription;
 
@@ -116,8 +116,8 @@ class _AfterAcceptanceRidePageState extends State<AfterAcceptanceRidePage> {
       patientLatLng = LatLng(dataSnap["patientDetails"]["latitude"],
           dataSnap["patientDetails"]["longitude"]);
       rideStatus = dataSnap["rideStatus"];
-      rideName = dataSnap["riderDetails"]["riderName"];
-      ridePhone = dataSnap["riderDetails"]["riderPhone"];
+      riderName = dataSnap["riderDetails"]["riderName"];
+      riderPhone = dataSnap["riderDetails"]["riderPhone"];
       dataLoaded = true;
 
       getPolyline();
@@ -230,7 +230,7 @@ class _AfterAcceptanceRidePageState extends State<AfterAcceptanceRidePage> {
                                   color: Colors.white,),
                               ),
                               Text(
-                                rideName,
+                                riderName,
                                 style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
@@ -240,7 +240,7 @@ class _AfterAcceptanceRidePageState extends State<AfterAcceptanceRidePage> {
                                 padding: EdgeInsets.all(10.0),
                                 child: IconButton(
                                   onPressed: () {
-                                    _launchPhoneCall("9905326811");
+                                    _launchPhoneCall(riderPhone);
                                   },
                                   icon: Icon(Icons.phone_android_outlined,
                                     color: Colors.white70,),
