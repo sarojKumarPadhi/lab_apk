@@ -1,4 +1,5 @@
 import 'package:badges/badges.dart' as badges;
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +16,10 @@ import 'package:jonk_lab/page/trackSample.dart';
 import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../controller/get_profile_controller.dart';
 import '../controller/lab_basic_details.dart';
 import '../controller/test_menu_controller.dart';
+import '../controller/update_profile_controller.dart';
 import '../drawer_item/Support.dart';
 import '../drawer_item/payment/Earnings_Screen.dart';
 import '../service/pushNotificationService.dart';
@@ -32,12 +35,19 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   LabBasicDetailsController labBasicDetailsController =
-  Get.put(LabBasicDetailsController());
+      Get.put(LabBasicDetailsController());
+  UpdateProfileController updateProfileController =
+      Get.put(UpdateProfileController());
+
+  GetProfileImageController getProfileImageController =
+      Get.put(GetProfileImageController());
+
   TestMenuController testMenuController = Get.put(TestMenuController());
   static const platform = MethodChannel("methodChannel");
 
   @override
   void initState() {
+    print(getProfileImageController.profileUrl.value);
     super.initState();
     requestSmsPermission();
     /// send otp using email address
@@ -46,7 +56,6 @@ class HomePageState extends State<HomePage> {
 
     FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
         alert: true, badge: true, sound: true);
-
   }
 
   Future<bool> checkConnectivity() async {
@@ -60,8 +69,8 @@ class HomePageState extends State<HomePage> {
 
   static Future<void> sendSms(String number, String otp) async {
     try {
-      final String status = await platform.invokeMethod(
-          "sendSms", {"number": number, "otp": otp});
+      final String status = await platform
+          .invokeMethod("sendSms", {"number": number, "otp": otp});
       // Handle the status string if needed
       print("SMS Status: $status");
     } catch (e) {
@@ -71,39 +80,32 @@ class HomePageState extends State<HomePage> {
   }
 
   /// send otp using email address
- static void sendOTP(String otp) {
+  static void sendOTP(String otp) {
     final emailService = EmailService(
       username: 'chanchalskylabstech@gmail.com',
       password: 'yfnnhzotieafpxws',
     );
 
-    emailService
-        .sendEmail(
+    emailService.sendEmail(
       "amitkumar.edugaon@gmail.com",
       'Your OTP for Verification',
       'Your OTP is: $otp',
     );
 
-    emailService
-        .sendEmail(
+    emailService.sendEmail(
       "prathamlabs801@gmail.com",
       'Your OTP for Verification',
       'Your OTP is: $otp',
     );
   }
 
-
   Future<void> requestSmsPermission() async {
-    if (await Permission.sms
-        .request()
-        .isGranted) {
+    if (await Permission.sms.request().isGranted) {
       // Permission is already granted, proceed with sending SMS
       sendSms("8210109466", "2345678");
     } else {
       // Permission has not been granted yet. Request it.
-      if (await Permission.sms
-          .request()
-          .isGranted) {
+      if (await Permission.sms.request().isGranted) {
         // sendSms();
       } else {
         // Permission denied. Show an error message or handle it gracefully.
@@ -114,14 +116,8 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery
-        .of(context)
-        .size
-        .height; //834
-    var width = MediaQuery
-        .of(context)
-        .size
-        .width; //392
+    var height = MediaQuery.of(context).size.height; //834
+    var width = MediaQuery.of(context).size.width; //392
     print(testMenuController.testMenuList.length.toString());
     return Container(
       decoration: const BoxDecoration(
@@ -141,7 +137,7 @@ class HomePageState extends State<HomePage> {
                   padding: EdgeInsets.symmetric(horizontal: deviceWidth! * .06),
                   child: badges.Badge(
                     badgeContent:
-                    Text('0', style: GoogleFonts.acme(color: Colors.white)),
+                        Text('0', style: GoogleFonts.acme(color: Colors.white)),
                     child: Icon(
                       Icons.notification_important_rounded,
                       size: deviceWidth! * .1,
@@ -155,71 +151,93 @@ class HomePageState extends State<HomePage> {
             child: ListView(
               padding: EdgeInsets.zero,
               children: <Widget>[
-                DrawerHeader(
-                    decoration: BoxDecoration(
-                      color: primaryColor,
-                    ),
-                    child: Obx(
-                          () =>
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment
-                                    .spaceBetween,
-                                children: [
-                                  SizedBox(
-                                    width: deviceWidth!*.5,
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          labBasicDetailsController
-                                              .labBasicDetailsData
-                                              .value
-                                              .basicDetails
-                                              ?.labName ??
-                                              "pratham lab..",
-                                          style: GoogleFonts.acme(
-                                              fontSize: deviceWidth! * .09),
-                                        ),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              labBasicDetailsController
-                                                  .labBasicDetailsData
-                                                  .value
-                                                  .accountStatus ==
-                                                  true
-                                                  ? "Verified"
-                                                  : "Not Verified ",
-                                              style: GoogleFonts.acme(
-                                                  fontSize: deviceWidth! * .05),
-                                            ),
-                                            labBasicDetailsController
-                                                .labBasicDetailsData
-                                                .value
-                                                .accountStatus ==
-                                                true
-                                                ? const Icon(
-                                              Icons.verified,
-                                              color: Colors.green,
-                                            )
-                                                : const Icon(
-                                              Icons.cancel,
-                                              color: Colors.red,
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Image.asset("assets/icon/labIcon.png",
-                                      width: deviceWidth! * .25),
-                                ],
-                              ),
-                            ],
-                          ),
-                    )),
+               Obx(() =>  DrawerHeader(
+                 decoration: BoxDecoration(
+                   color: getProfileImageController.profileUrl.value != ""
+                       ? Colors.transparent
+                       : primaryColor,
+                   image: getProfileImageController.profileUrl.value != ""
+                       ? DecorationImage(
+                     fit: BoxFit.cover,
+                     image: CachedNetworkImageProvider(
+                       getProfileImageController.profileUrl.value,
+                     ),
+                   )
+                       : null,
+                 ),
+                 child: Stack(
+                   children: [
+                     Container(
+                       padding: EdgeInsets.all(deviceWidth!*.05),
+                       decoration: BoxDecoration(
+                         color: Colors.white.withOpacity(0.8),
+                         borderRadius: BorderRadius.circular(deviceWidth!*.02),
+                         boxShadow: [
+                           BoxShadow(
+                             color: Colors.grey.withOpacity(0.5),
+                             spreadRadius: 2,
+                             blurRadius: 5,
+                             offset: Offset(0, 3),
+                           ),
+                         ],
+                       ),
+                       child: Column(
+                         mainAxisSize: MainAxisSize.min,
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                         children: [
+                           Text(
+                             labBasicDetailsController.labBasicDetailsData.value.basicDetails?.labName ?? "Pratham Lab",
+                             style: TextStyle(
+                               fontSize: deviceWidth!*.04,
+                               fontWeight: FontWeight.bold,
+                               color: Colors.black87,
+                             ),
+                           ),
+                           SizedBox(height: 10),
+                           Row(
+                             children: [
+                               Icon(
+                                 labBasicDetailsController.labBasicDetailsData.value.accountStatus ? Icons.verified : Icons.cancel,
+                                 color: labBasicDetailsController.labBasicDetailsData.value.accountStatus ? Colors.green : Colors.red,
+                               ),
+                               SizedBox(width: 5),
+                               Text(
+                                 labBasicDetailsController.labBasicDetailsData.value.accountStatus ? "Verified" : "Not Verified",
+                                 style: TextStyle(
+                                   fontSize: 16,
+                                   color: labBasicDetailsController.labBasicDetailsData.value.accountStatus ? Colors.green : Colors.red,
+                                 ),
+                               ),
+                             ],
+                           ),
+                         ],
+                       ),
+                     ),
+                     Positioned(
+                       top: 10,
+                       right: 10,
+                       child: GestureDetector(
+                         onTap: () {
+                           updateProfileController.updateProfile();
+                         },
+                         child: Container(
+                           padding: EdgeInsets.all(10),
+                           decoration: BoxDecoration(
+                             color: Colors.blue,
+                             shape: BoxShape.circle,
+                           ),
+                           child: Icon(
+                             Icons.edit,
+                             color: Colors.white,
+                           ),
+                         ),
+                       ),
+                     ),
+                   ],
+                 ),
+               )
+                 ,
+               ),
                 ListTile(
                   leading: const Icon(
                     Icons.person,
@@ -297,169 +315,162 @@ class HomePageState extends State<HomePage> {
               if (snapshot.hasData) {
                 if (snapshot.data == true) {
                   return Obx(
-                        () =>
+                    () => Column(
+                      children: [
                         Column(
-                          children: [
-                            Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Row(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 20, top: 20),
-                                        child: Text(
-                                          "Hello, ${labBasicDetailsController
-                                              .labBasicDetailsData.value
-                                              .basicDetails?.labName ?? ""}",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: width * 6.3 / 100,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
                                   Padding(
-                                    padding:
+                                    padding: const EdgeInsets.only(
+                                        left: 20, top: 20),
+                                    child: Text(
+                                      labBasicDetailsController.labBasicDetailsData.value.basicDetails?.labName ?? "",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: deviceWidth!*.055,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding:
                                     const EdgeInsets.only(left: 20, top: 5),
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.location_on),
-                                        Text(
-                                          labBasicDetailsController
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.location_on),
+                                    Text(
+                                      labBasicDetailsController
                                               .labBasicDetailsData
                                               .value
                                               .address
                                               ?.city ??
-                                              "Hisar",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: width * 4 / 100,
-                                              fontWeight: FontWeight.w400),
+                                          "Hisar",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: width * 4 / 100,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ]),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            top: height * .04,
+                            left: width * .1,
+                          ),
+                          child: Row(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Get.to(() => const NewPatient(),
+                                      transition: Transition.leftToRight,
+                                      duration:
+                                          const Duration(milliseconds: 400));
+                                },
+                                child: Container(
+                                  width: width * .4,
+                                  height: height * .2,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: const Color(0xFF111111),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 9, right: 15),
+                                            child: SvgPicture.asset(
+                                                "assets/icon/addNewSample.svg",
+                                                width: deviceWidth! * .1),
+                                          )
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 8),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              "New \nSample \nPath",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: height / 40,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
+                                      )
+                                    ],
                                   ),
-                                ]),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                top: height * .04,
-                                left: width * .1,
+                                ),
                               ),
-                              child: Row(
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      Get.to(() => const NewPatient(),
-                                          transition: Transition.leftToRight,
-                                          duration:
-                                          const Duration(milliseconds: 400));
-                                    },
-                                    child: Container(
-                                      width: width * .4,
-                                      height: height * .2,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        color: const Color(0xFF111111),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 9, right: 15),
-                                                child: SvgPicture.asset(
-                                                    "assets/icon/addNewSample.svg",
-                                                    width: deviceWidth! * .1),
-                                              )
-                                            ],
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 8),
-                                            child: Row(
-                                              children: [
-                                                Text(
-                                                  "New \nSample \nPath",
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: height / 40,
-                                                      fontWeight: FontWeight
-                                                          .bold),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  top: height * .05, left: width * .1),
-                              child: Row(
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      Get.to(() => const TrackSample(),
-                                          transition: Transition.leftToRight,
-                                          duration:
-                                          const Duration(milliseconds: 400));
-                                    },
-                                    child: Container(
-                                      width: width * .4,
-                                      height: height * .20,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        color: const Color(0xFF111111),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 9, right: 15),
-                                                child: SvgPicture.asset(
-                                                    "assets/icon/newSamplePath.svg",
-                                                    width: deviceWidth! * .1),
-                                              )
-                                            ],
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 8),
-                                            child: Row(
-                                              children: [
-                                                Text(
-                                                  "Track \nSample \nPath",
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: height / 40,
-                                                      fontWeight: FontWeight
-                                                          .bold),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                              top: height * .05, left: width * .1),
+                          child: Row(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Get.to(() => const TrackSample(),
+                                      transition: Transition.leftToRight,
+                                      duration:
+                                          const Duration(milliseconds: 400));
+                                },
+                                child: Container(
+                                  width: width * .4,
+                                  height: height * .20,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: const Color(0xFF111111),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 9, right: 15),
+                                            child: SvgPicture.asset(
+                                                "assets/icon/newSamplePath.svg",
+                                                width: deviceWidth! * .1),
+                                          )
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 8),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              "Track \nSample \nPath",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: height / 40,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 } else {
                   return Center(

@@ -63,7 +63,7 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
             onCameraMove: (CameraPosition ? position) {
             if(_pickedLocation != position!.target){
                 setState(() {
-                  _pickedLocation=position!.target;
+                  _pickedLocation=position.target;
                 });
             }
             },
@@ -175,7 +175,6 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
         : ridePriceController.timeZonePrice.value.night;
     int riderCharges =
         (directionInfoDetails!.distance_value! ~/ 1000 * kmPrice);
-
     priceController.price.value =
         riderCharges > ridePriceController.minimumRidePrice.value
             ? riderCharges
