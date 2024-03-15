@@ -119,9 +119,9 @@ class _AfterAcceptanceRidePageState extends State<AfterAcceptanceRidePage> {
       riderName = dataSnap["riderDetails"]["riderName"];
       riderPhone = dataSnap["riderDetails"]["riderPhone"];
       dataLoaded = true;
-
       getPolyline();
-    } else {
+    }
+    else {
       Fluttertoast.showToast(msg: "Data not found");
     }
   }
