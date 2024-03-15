@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 ///------------global-----------------
@@ -11,6 +12,7 @@ double? deviceHeight;
 String? latestRideId;
 int? totalDistance;
 int totalPrice=0;
+String? auth = FirebaseAuth.instance.currentUser?.uid;
 
 
 

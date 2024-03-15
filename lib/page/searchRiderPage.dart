@@ -36,11 +36,9 @@ class SearchRiderPage extends StatefulWidget {
 class _SearchRiderPageState extends State<SearchRiderPage> {
   PushNotificationService pushNotificationService = PushNotificationService();
 
-  SearchingRideController searchingRideController =
-      Get.put(SearchingRideController());
+  SearchingRideController searchingRideController = Get.put(SearchingRideController());
   LabBasicDetailsController labBasicDetailsController = Get.find();
-  PushNotificationController pushNotificationController =
-      Get.put(PushNotificationController());
+  PushNotificationController pushNotificationController = Get.put(PushNotificationController());
   BitmapDescriptor? customMarkerLabIcon;
   BitmapDescriptor? customMarkerPatientIcon;
   BitmapDescriptor? customMarkerRiderIcon;
@@ -97,6 +95,7 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
      latestRideId = uId!;
     await ref.set({
       "rideStatus": "idle",
+      "requestId": uId!,
       "labDetails": {
         "phoneNumber": labBasicDetailsController
             .labBasicDetailsData.value.phoneNumber
