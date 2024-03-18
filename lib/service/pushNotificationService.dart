@@ -110,6 +110,7 @@ class PushNotificationService {
         }
         print("App opened from background with notification");
         print(remoteMessage.data);
+
       }
     });
 
@@ -132,6 +133,7 @@ class PushNotificationService {
         readLabRideRequestInformation(remoteMessage.data["rideRequestId"],
             context, remoteMessage.data["labUid"]);
       }
+
     });
   }
 

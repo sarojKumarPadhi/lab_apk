@@ -18,7 +18,7 @@ class GetAllChatController extends GetxController {
 
   getData() async {
     String auth = FirebaseAuth.instance.currentUser!.uid;
-    String adminId = "xn4LhPywoDdOJ0x53XHCoMTlW6E3";
+    String adminId = "TPCMeIo01KT64JTTZZsHH347wCT2";
     List<String> ids = [auth, adminId];
     ids.sort();
     String docId = ids.join("_");
@@ -40,14 +40,15 @@ class GetAllChatController extends GetxController {
                   dynamic>)); // Insert new messages at the beginning of the list
           allIds.add(documentSnapshot.id);
         }
-        isLoading.value=true;
+
       }
+      isLoading.value=true;
     });
   }
 
   sendMessage(String message) async {
     String auth = FirebaseAuth.instance.currentUser!.uid;
-    String adminId = "xn4LhPywoDdOJ0x53XHCoMTlW6E3";
+    String adminId = "TPCMeIo01KT64JTTZZsHH347wCT2";
     List<String> ids = [auth, adminId];
     ids.sort();
     String docId = ids.join("_");
@@ -58,7 +59,7 @@ class GetAllChatController extends GetxController {
         .doc(uuid.v4())
         .set({
       "senderId": auth,
-      "receiverId": "xn4LhPywoDdOJ0x53XHCoMTlW6E3",
+      "receiverId": "TPCMeIo01KT64JTTZZsHH347wCT2",
       "message": message,
       "timeStamp": Timestamp.now()
     });
@@ -66,7 +67,7 @@ class GetAllChatController extends GetxController {
 
   sendPicture(String imageUrl) async {
     String auth = FirebaseAuth.instance.currentUser!.uid;
-    String adminId = "xn4LhPywoDdOJ0x53XHCoMTlW6E3";
+    String adminId = "TPCMeIo01KT64JTTZZsHH347wCT2";
     List<String> ids = [auth, adminId];
     ids.sort();
     String docId = ids.join("_");
@@ -77,7 +78,7 @@ class GetAllChatController extends GetxController {
         .doc(uuid.v4())
         .set({
       "senderId": auth,
-      "receiverId": "xn4LhPywoDdOJ0x53XHCoMTlW6E3",
+      "receiverId": "TPCMeIo01KT64JTTZZsHH347wCT2",
       "imageUrl": imageUrl,
       "timeStamp": Timestamp.now()
     });

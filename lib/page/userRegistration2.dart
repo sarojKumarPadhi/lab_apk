@@ -1,11 +1,16 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/page/userRegistration3.dart';
+
+import '../controller/registration_lab_location_controller.dart';
+import '../global/globalData.dart';
 import '../model/predected_place.dart';
+import '../permission_handler/device_location_permission.dart';
 import '../services/networkRequest.dart';
 
 final _formKey = GlobalKey<FormState>();
@@ -20,6 +25,8 @@ class UserRegistration2 extends StatefulWidget {
 class _UserRegistration2State extends State<UserRegistration2> {
   final labLocationController = TextEditingController();
   final selectedLabLocationController = TextEditingController();
+  RegistrationLabLocationController registrationLabLocationController =
+      Get.put(RegistrationLabLocationController());
   GetStorage getStorage = GetStorage();
   List<PredictedPlaces> predictedList = [];
   double? latitude;
@@ -28,6 +35,7 @@ class _UserRegistration2State extends State<UserRegistration2> {
 
   @override
   initState() {
+    deviceLocationPermissions();
     super.initState();
     Map<String, dynamic> mapData =
         getStorage.read("labLatLongWithLocation") ?? {};
@@ -185,29 +193,194 @@ class _UserRegistration2State extends State<UserRegistration2> {
       ),
       floatingActionButton: FadeInRight(
         duration: const Duration(milliseconds: 3000),
-        child: FloatingActionButton(
-          onPressed: () {
-            if (selectedLabLocationController.text.isNotEmpty) {
-              if (latitude != null && longitude != null&&deviceToken!=null) {
-                Map<String, dynamic> mapLocationDetails = {
-                  "latitude": latitude!,
-                  "longitude": longitude!,
-                  "labLocation": selectedLabLocationController.text
-                };
-                getStorage.write("labLatLongWithLocation", mapLocationDetails);
-                getStorage.write("fcmToken", deviceToken);
-                Get.to(() => const UserRegistration3());
-              }
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text("Please enter lab location from search")));
-            }
-          },
-          backgroundColor: buttonColor,
-          child: Icon(Icons.navigate_next,
-              color: Colors.white, size: deviceWidth * .1),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            FloatingActionButton(
+              onPressed: () {
+                showGeneralDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  pageBuilder: (context, animation, secondaryAnimation) {
+                    return Builder(
+                      builder: (context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(deviceWidth! * .02)),
+                          title: Text("Location Confirmation"),
+                          content: Text(
+                              "Make Sure Now you are on your lab Location"),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                // Add functionality for confirm button here
+                                Navigator.of(context).pop();
+                                // Add your confirmation logic here
+                                showSetLocationDialog();
+                              },
+                              child: Text("Confirm"),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("Cancel"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  transitionBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return ZoomIn(child: child);
+                  },
+                );
+              },
+              child: const Icon(Icons.add),
+            ),
+            FloatingActionButton(
+              onPressed: () {
+                if (selectedLabLocationController.text.isNotEmpty) {
+                  if (latitude != null &&
+                      longitude != null &&
+                      deviceToken != null) {
+                    Map<String, dynamic> mapLocationDetails = {
+                      "latitude": latitude!,
+                      "longitude": longitude!,
+                      "labLocation": selectedLabLocationController.text
+                    };
+                    getStorage.write(
+                        "labLatLongWithLocation", mapLocationDetails);
+                    getStorage.write("fcmToken", deviceToken);
+                    Get.to(() => const UserRegistration3());
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("Please enter lab location from search")));
+                }
+              },
+              backgroundColor: buttonColor,
+              child: Icon(Icons.navigate_next,
+                  color: Colors.white, size: deviceWidth * .1),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  showSetLocationDialog() {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Builder(
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(deviceWidth! * .02)),
+              title: const Text("Set Lab Location"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: labLocationController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText:
+                          "SCO 801, NAC Manimajra, Sector 13, Chandigarh, Panchkula, Chandigarh 160101",
+                      hintStyle: TextStyle(fontSize: deviceWidth! * .04),
+                      enabledBorder: const OutlineInputBorder(),
+                      focusedBorder: const OutlineInputBorder(),
+                      fillColor: Colors.white54,
+                      filled: true,
+                    ),
+                  ),
+                  SizedBox(
+                    height: deviceHeight! * .02,
+                  ),
+                  Obx(
+                    () => TextFormField(
+                      readOnly: true,
+                      maxLines: 1,
+                      decoration: InputDecoration(
+                        hintText: registrationLabLocationController
+                                    .latitude.value ==
+                                0.0
+                            ? "30.6543, 76.45678"
+                            : "${registrationLabLocationController.latitude.value.toString()}, ${registrationLabLocationController.longitude.value.toString()}",
+                        hintStyle: TextStyle(fontSize: deviceWidth! * .04),
+                        enabledBorder: const OutlineInputBorder(),
+                        focusedBorder: const OutlineInputBorder(),
+                        fillColor: Colors.white54,
+                        filled: true,
+                      ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                          style: ButtonStyle(
+                              shape: MaterialStatePropertyAll(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          deviceWidth! * .02))),
+                              backgroundColor:
+                                  MaterialStatePropertyAll(primaryColor)),
+                          onPressed: () {
+                            registrationLabLocationController.getLocation();
+                          },
+                          child: const Text(
+                            "Get Location",
+                            style: TextStyle(color: Colors.white),
+                          )),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    if (labLocationController.text.isNotEmpty &&
+                        registrationLabLocationController.latitude.value !=
+                            0.0 &&
+                        registrationLabLocationController.longitude.value !=
+                            0.0) {
+                      Map<String, dynamic> mapLocationDetails = {
+                        "latitude":
+                            registrationLabLocationController.latitude.value,
+                        "longitude":
+                            registrationLabLocationController.longitude.value,
+                        "labLocation": labLocationController.text
+                      };
+                      getStorage.write(
+                          "labLatLongWithLocation", mapLocationDetails);
+                      getStorage.write("fcmToken", deviceToken);
+
+                      Get.to(() => const UserRegistration3());
+                    } else {
+                      Fluttertoast.showToast(msg: "Enter all fields");
+                    }
+                  },
+                  child: Text("Confirm"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Cancel"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return ZoomIn(child: child);
+      },
     );
   }
 }

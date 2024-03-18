@@ -4,10 +4,12 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/page/userRegistration2.dart';
-
 import '../component/myTextField.dart';
 import '../global/globalData.dart';
 import '../global/progressIndicator.dart';
+import '../permission_handler/device_location_permission.dart';
+
+
 
 final _formKey = GlobalKey<FormState>();
 
@@ -34,6 +36,7 @@ class _UserRegistration1State extends State<UserRegistration1> {
   @override
   initState() {
     super.initState();
+
     if (getStorage.read("addressDetails") != null) {
       Map<String, dynamic> getData = getStorage.read("addressDetails");
       state.text = getData["state"];
@@ -214,9 +217,7 @@ class _UserRegistration1State extends State<UserRegistration1> {
               SizedBox(
                 height: deviceHeight * .02,
               ),
-
               ///--------for country---------------
-
               FadeInUp(
                 duration: const Duration(milliseconds: 2000),
                 child: Padding(
@@ -248,7 +249,6 @@ class _UserRegistration1State extends State<UserRegistration1> {
               SizedBox(
                 height: deviceHeight * .02,
               ),
-
               ///-----------------for state----------------
               FadeInUp(
                 duration: const Duration(milliseconds: 2000),
@@ -292,8 +292,7 @@ class _UserRegistration1State extends State<UserRegistration1> {
               SizedBox(
                 height: deviceHeight * .02,
               ),
-
-              ///----------------for district--------------
+              ///----------------for district-------------------
               FadeInUp(
                 duration: const Duration(milliseconds: 2000),
                 child: Padding(
@@ -376,6 +375,7 @@ class _UserRegistration1State extends State<UserRegistration1> {
                   validator: (String? value) {
                     if (value!.isEmpty) return "Enter a valid pin";
                     if (value.length < 6) return "Enter a valid pin";
+                    if (value.length > 6) return "Enter a valid pin";
                     return null;
                   },
                 ),
@@ -423,7 +423,7 @@ class _UserRegistration1State extends State<UserRegistration1> {
                         style: TextStyle(color: Colors.white)),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

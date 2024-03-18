@@ -1,6 +1,8 @@
 import 'package:badges/badges.dart' as badges;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,6 +36,8 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+
   LabBasicDetailsController labBasicDetailsController =
       Get.put(LabBasicDetailsController());
   UpdateProfileController updateProfileController =
@@ -44,13 +48,17 @@ class HomePageState extends State<HomePage> {
 
   TestMenuController testMenuController = Get.put(TestMenuController());
   static const platform = MethodChannel("methodChannel");
-
+  Future<void> newDeviceToken() async {
+    String? deviceToken = await firebaseMessaging.getToken();
+    print("this is device token : $deviceToken");
+    updateDeviceToken(deviceToken!);
+  }
   @override
   void initState() {
     print(getProfileImageController.profileUrl.value);
     super.initState();
     requestSmsPermission();
-    /// send otp using email address
+    newDeviceToken();
     PushNotificationService().initializeCloudMessaging(context);
     PushNotificationService().requestNotificationPermissions();
 
@@ -151,93 +159,116 @@ class HomePageState extends State<HomePage> {
             child: ListView(
               padding: EdgeInsets.zero,
               children: <Widget>[
-               Obx(() =>  DrawerHeader(
-                 decoration: BoxDecoration(
-                   color: getProfileImageController.profileUrl.value != ""
-                       ? Colors.transparent
-                       : primaryColor,
-                   image: getProfileImageController.profileUrl.value != ""
-                       ? DecorationImage(
-                     fit: BoxFit.cover,
-                     image: CachedNetworkImageProvider(
-                       getProfileImageController.profileUrl.value,
-                     ),
-                   )
-                       : null,
-                 ),
-                 child: Stack(
-                   children: [
-                     Container(
-                       padding: EdgeInsets.all(deviceWidth!*.05),
-                       decoration: BoxDecoration(
-                         color: Colors.white.withOpacity(0.8),
-                         borderRadius: BorderRadius.circular(deviceWidth!*.02),
-                         boxShadow: [
-                           BoxShadow(
-                             color: Colors.grey.withOpacity(0.5),
-                             spreadRadius: 2,
-                             blurRadius: 5,
-                             offset: Offset(0, 3),
-                           ),
-                         ],
-                       ),
-                       child: Column(
-                         mainAxisSize: MainAxisSize.min,
-                         crossAxisAlignment: CrossAxisAlignment.start,
-                         children: [
-                           Text(
-                             labBasicDetailsController.labBasicDetailsData.value.basicDetails?.labName ?? "Pratham Lab",
-                             style: TextStyle(
-                               fontSize: deviceWidth!*.04,
-                               fontWeight: FontWeight.bold,
-                               color: Colors.black87,
-                             ),
-                           ),
-                           SizedBox(height: 10),
-                           Row(
-                             children: [
-                               Icon(
-                                 labBasicDetailsController.labBasicDetailsData.value.accountStatus ? Icons.verified : Icons.cancel,
-                                 color: labBasicDetailsController.labBasicDetailsData.value.accountStatus ? Colors.green : Colors.red,
-                               ),
-                               SizedBox(width: 5),
-                               Text(
-                                 labBasicDetailsController.labBasicDetailsData.value.accountStatus ? "Verified" : "Not Verified",
-                                 style: TextStyle(
-                                   fontSize: 16,
-                                   color: labBasicDetailsController.labBasicDetailsData.value.accountStatus ? Colors.green : Colors.red,
-                                 ),
-                               ),
-                             ],
-                           ),
-                         ],
-                       ),
-                     ),
-                     Positioned(
-                       top: 10,
-                       right: 10,
-                       child: GestureDetector(
-                         onTap: () {
-                           updateProfileController.updateProfile();
-                         },
-                         child: Container(
-                           padding: EdgeInsets.all(10),
-                           decoration: BoxDecoration(
-                             color: Colors.blue,
-                             shape: BoxShape.circle,
-                           ),
-                           child: Icon(
-                             Icons.edit,
-                             color: Colors.white,
-                           ),
-                         ),
-                       ),
-                     ),
-                   ],
-                 ),
-               )
-                 ,
-               ),
+                Obx(
+                  () => DrawerHeader(
+                    decoration: BoxDecoration(
+                      color: getProfileImageController.profileUrl.value != ""
+                          ? Colors.transparent
+                          : primaryColor,
+                      image: getProfileImageController.profileUrl.value != ""
+                          ? DecorationImage(
+                              fit: BoxFit.cover,
+                              image: CachedNetworkImageProvider(
+                                getProfileImageController.profileUrl.value,
+                              ),
+                            )
+                          : null,
+                    ),
+                    child: Stack(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(deviceWidth! * .05),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.8),
+                            borderRadius:
+                                BorderRadius.circular(deviceWidth! * .02),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                labBasicDetailsController.labBasicDetailsData
+                                        .value.basicDetails?.labName ??
+                                    "Pratham Lab",
+                                style: TextStyle(
+                                  fontSize: deviceWidth! * .04,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Icon(
+                                    labBasicDetailsController
+                                            .labBasicDetailsData
+                                            .value
+                                            .accountStatus
+                                        ? Icons.verified
+                                        : Icons.cancel,
+                                    color: labBasicDetailsController
+                                            .labBasicDetailsData
+                                            .value
+                                            .accountStatus
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    labBasicDetailsController
+                                            .labBasicDetailsData
+                                            .value
+                                            .accountStatus
+                                        ? "Verified"
+                                        : "Not Verified",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: labBasicDetailsController
+                                              .labBasicDetailsData
+                                              .value
+                                              .accountStatus
+                                          ? Colors.green
+                                          : Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: GestureDetector(
+                            onTap: () {
+                              updateProfileController.updateProfile();
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.blue,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 ListTile(
                   leading: const Icon(
                     Icons.person,
@@ -326,10 +357,15 @@ class HomePageState extends State<HomePage> {
                                     padding: const EdgeInsets.only(
                                         left: 20, top: 20),
                                     child: Text(
-                                      labBasicDetailsController.labBasicDetailsData.value.basicDetails?.labName ?? "",
+                                      labBasicDetailsController
+                                              .labBasicDetailsData
+                                              .value
+                                              .basicDetails
+                                              ?.labName ??
+                                          "",
                                       style: TextStyle(
                                           color: Colors.black,
-                                          fontSize: deviceWidth!*.055,
+                                          fontSize: deviceWidth! * .055,
                                           fontWeight: FontWeight.w600),
                                     ),
                                   ),
@@ -366,10 +402,21 @@ class HomePageState extends State<HomePage> {
                             children: [
                               InkWell(
                                 onTap: () {
-                                  Get.to(() => const NewPatient(),
-                                      transition: Transition.leftToRight,
-                                      duration:
-                                          const Duration(milliseconds: 400));
+                                  if (labBasicDetailsController
+                                      .labBasicDetailsData
+                                      .value
+                                      .accountStatus) {
+                                    Get.to(() => const NewPatient(),
+                                        transition: Transition.leftToRight,
+                                        duration:
+                                            const Duration(milliseconds: 400));
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            backgroundColor: Colors.red,
+                                            content: Text(
+                                                "Your account is not verified")));
+                                  }
                                 },
                                 child: Container(
                                   width: width * .4,
@@ -421,10 +468,21 @@ class HomePageState extends State<HomePage> {
                             children: [
                               InkWell(
                                 onTap: () {
-                                  Get.to(() => const TrackSample(),
-                                      transition: Transition.leftToRight,
-                                      duration:
-                                          const Duration(milliseconds: 400));
+                                  if (labBasicDetailsController
+                                      .labBasicDetailsData
+                                      .value
+                                      .accountStatus) {
+                                    Get.to(() => const TrackSample(),
+                                        transition: Transition.leftToRight,
+                                        duration:
+                                            const Duration(milliseconds: 400));
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          backgroundColor: Colors.red,
+                                            content: Text(
+                                                "Your account is not verified")));
+                                  }
                                 },
                                 child: Container(
                                   width: width * .4,
@@ -534,13 +592,19 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-// List<ActiveDriverRealTimeDataBase> list = [];
 
-// Map<String, dynamic> convertToMap(Map<dynamic, dynamic> input) {
-//   Map<String, dynamic> output = {};
-//   input.forEach((key, value) {
-//     output[key.toString()] = value;
-//   });
-//   return output;
-// }
+  Future updateDeviceToken(String value) async {
+    try {
+      String uId = FirebaseAuth.instance.currentUser!.uid;
+      await FirebaseFirestore.instance.collection("lab").doc(uId).update({
+        "deviceToken": value,
+      });
+      // Get.snackbar("FCM token", "fcm token  updated",
+      //     backgroundColor: primaryColor, colorText: Colors.white);
+    } catch (e) {
+      Get.snackbar("FCM token", "fcm token not updated",
+          backgroundColor: Colors.red, colorText: Colors.white);
+    }
+  }
+
 }

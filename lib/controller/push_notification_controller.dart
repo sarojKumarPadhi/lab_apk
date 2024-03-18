@@ -27,7 +27,7 @@ class PushNotificationController extends GetxController {
         if (riderData is Map<dynamic, dynamic>) {
           riderData.forEach((riderKey, riderInfo) {
             // Ensure riderInfo is a Map<dynamic, dynamic>
-            if (riderInfo is Map<dynamic, dynamic>) {
+            if (riderInfo is Map<dynamic, dynamic> &&  riderInfo['rideStatus'] == 'idle') {
               deviceToken.add(riderInfo['deviceTokens']);
               allOnlineDriverData.add(ActiveDriverRealTimeDataBase(
                   name: riderInfo['name'],
