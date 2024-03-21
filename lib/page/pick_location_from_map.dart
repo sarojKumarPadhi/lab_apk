@@ -6,6 +6,7 @@ import 'package:jonk_lab/controller/lab_basic_details.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/page/newPatient.dart';
 
+import '../controller/new_ride_controller.dart';
 import '../controller/ride_price_controller.dart';
 import '../controller/rider_price_controller.dart';
 import '../model/direction_detail_info.dart';
@@ -30,6 +31,7 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
   PriceController priceController = Get.put(PriceController());
   LabBasicDetailsController labBasicDetailsController = Get.find();
   RidePriceController ridePriceController = Get.put(RidePriceController());
+  NewRideController newRideController = Get.find();
 
   @override
   void initState() {
@@ -60,12 +62,12 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
               zoom: 15,
               target: _pickedLocation,
             ),
-            onCameraMove: (CameraPosition ? position) {
-            if(_pickedLocation != position!.target){
+            onCameraMove: (CameraPosition? position) {
+              if (_pickedLocation != position!.target) {
                 setState(() {
-                  _pickedLocation=position.target;
+                  _pickedLocation = position.target;
                 });
-            }
+              }
             },
             onCameraIdle: () async {
               NewPatient.latLng = _pickedLocation;
@@ -73,17 +75,18 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
                   LatLng(_pickedLocation.latitude, _pickedLocation.longitude));
               latLngToAddress(_pickedLocation);
             },
-
-            onMapCreated: (GoogleMapController controller) { },
-
+            onMapCreated: (GoogleMapController controller) {},
           ),
           Align(
-          alignment: Alignment.center,
+            alignment: Alignment.center,
             child: Padding(
               padding: const EdgeInsets.only(bottom: 35),
-              child: Image.asset("assets/icon/pin.png",height: 35,width: 35,),
+              child: Image.asset(
+                "assets/icon/pin.png",
+                height: 35,
+                width: 35,
+              ),
             ),
-
           ),
           street != null
               ? Positioned(
@@ -128,6 +131,8 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
                             ElevatedButton(
                               onPressed: () async {
                                 NewPatient.patientLocation =
+                                    "${street ?? ""}, ${subLocality ?? ""}, ${locality ?? ""}, ${administrativeArea ?? ""}, ${pinCode ?? ""}";
+                                newRideController.patientLocation.value =
                                     "${street ?? ""}, ${subLocality ?? ""}, ${locality ?? ""}, ${administrativeArea ?? ""}, ${pinCode ?? ""}";
 
                                 // newSampleDataModel.latLng = _pickedLocation;
@@ -179,7 +184,6 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
         riderCharges > ridePriceController.minimumRidePrice.value
             ? riderCharges
             : ridePriceController.minimumRidePrice.value;
-    NewPatient.riderPrice =
-        priceController.price.value.toString();
+    NewPatient.riderPrice = priceController.price.value.toString();
   }
 }

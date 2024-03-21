@@ -7,6 +7,7 @@ import 'package:jonk_lab/global/globalData.dart';
 import 'package:jonk_lab/page/newPatient.dart';
 import 'package:jonk_lab/page/pick_location_from_map.dart';
 import '../controller/lab_basic_details.dart';
+import '../controller/new_ride_controller.dart';
 import '../controller/ride_price_controller.dart';
 import '../controller/rider_price_controller.dart';
 import '../model/direction_detail_info.dart';
@@ -25,6 +26,7 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
   LabBasicDetailsController labBasicDetailsController = Get.find();
   PriceController priceController = Get.put(PriceController());
   RidePriceController ridePriceController = Get.put(RidePriceController());
+  NewRideController newRideController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +57,8 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
                   }
                 } else {
                   predictedList.clear();
-                  setState(() {});
+                  setState(() {}
+                  );
                 }
               },
               decoration: const InputDecoration(
@@ -64,26 +67,26 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
                   enabledBorder: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder()),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton.icon(
-                      onPressed: () {
-                        Get.to(() => const PickLocationFromMap());
-                      },
-                      icon: const Icon(
-                        Icons.fmd_good_rounded,
-                        color: Colors.red,
-                      ),
-                      label: Text(
-                        "Select from map",
-                        style: GoogleFonts.acme(),
-                      )),
-                ),
-              ],
-            ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.end,
+            //   children: [
+            //     Padding(
+            //       padding: const EdgeInsets.all(8.0),
+            //       child: ElevatedButton.icon(
+            //           onPressed: () {
+            //
+            //           },
+            //           icon: const Icon(
+            //             Icons.fmd_good_rounded,
+            //             color: Colors.red,
+            //           ),
+            //           label: Text(
+            //             "Select from map",
+            //             style: GoogleFonts.acme(),
+            //           )),
+            //     ),
+            //   ],
+            // ),
             Expanded(
               child: predictedList.isNotEmpty
                   ? ListView.builder(
@@ -100,6 +103,8 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
                           LatLng? result = await apiRequestForLatLng(apiUrl);
                           NewPatient.latLng =
                               LatLng(result!.latitude, result.longitude);
+                          newRideController.patientLocation.value=  predictedList[index].main_text! +
+                              predictedList[index].secondary_id!;
                           print(result.toString());
                           await getDistanceBetweenPoints(
                               LatLng(result.latitude, result.longitude));

@@ -23,6 +23,7 @@ import '../controller/lab_basic_details.dart';
 import '../controller/test_menu_controller.dart';
 import '../controller/update_profile_controller.dart';
 import '../drawer_item/Support.dart';
+import '../drawer_item/master_list.dart';
 import '../drawer_item/payment/Earnings_Screen.dart';
 import '../service/pushNotificationService.dart';
 import '../services/email_service.dart';
@@ -280,6 +281,21 @@ class HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => const LabProfilePage(),
+                        ));
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  leading: const Icon(
+                    Icons.payment,
+                    color: Colors.black,
+                  ),
+                  title: const Text('Master List'),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MasterList(),
                         ));
                   },
                 ),
