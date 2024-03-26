@@ -70,7 +70,7 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
               }
             },
             onCameraIdle: () async {
-              NewPatient.latLng = _pickedLocation;
+              newRideController.patientLatLng = _pickedLocation;
               await getDistanceBetweenPoints(
                   LatLng(_pickedLocation.latitude, _pickedLocation.longitude));
               latLngToAddress(_pickedLocation);
@@ -130,7 +130,7 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
                           children: [
                             ElevatedButton(
                               onPressed: () async {
-                                NewPatient.patientLocation =
+                                newRideController.patientLocation.value =
                                     "${street ?? ""}, ${subLocality ?? ""}, ${locality ?? ""}, ${administrativeArea ?? ""}, ${pinCode ?? ""}";
                                 newRideController.patientLocation.value =
                                     "${street ?? ""}, ${subLocality ?? ""}, ${locality ?? ""}, ${administrativeArea ?? ""}, ${pinCode ?? ""}";
@@ -184,6 +184,5 @@ class _PickLocationFromMapState extends State<PickLocationFromMap> {
         riderCharges > ridePriceController.minimumRidePrice.value
             ? riderCharges
             : ridePriceController.minimumRidePrice.value;
-    NewPatient.riderPrice = priceController.price.value.toString();
   }
 }

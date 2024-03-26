@@ -8,10 +8,8 @@ class TestSamplesController extends GetxController {
   addSample(String sampleName) {
     if (testSamples.contains(sampleName)) {
       testSamples.remove(sampleName);
-      NewPatient.tests=testSamples;
     } else {
       testSamples.add(sampleName);
-      NewPatient.tests=testSamples;
 
     }
   }

@@ -1,21 +1,16 @@
-import 'package:audioplayers/audioplayers.dart' as audio;
-import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jonk_lab/controller/master_list_controller.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/global/globalData.dart';
-import 'package:jonk_lab/model/test_menu_model.dart';
 import 'package:jonk_lab/page/patientLocationPage.dart';
 import 'package:jonk_lab/page/pick_location_from_map.dart';
+import 'package:jonk_lab/page/searchRiderPage.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:record/record.dart';
 import 'package:shimmer/shimmer.dart';
-
 import '../controller/new_ride_controller.dart';
 import '../controller/ride_price_controller.dart';
 import '../controller/rider_price_controller.dart';
@@ -24,14 +19,7 @@ import '../controller/test_samples_controller.dart';
 
 class NewPatient extends StatefulWidget {
   const NewPatient({Key? key}) : super(key: key);
-  static String? patientName;
-  static String? mobileNumber;
-  static String? age;
-  static List<String>? tests;
-  static String? patientLocation;
-  static LatLng? latLng;
-  static String? riderPrice;
-  static String? testPrice;
+
 
   @override
   State<NewPatient> createState() => _NewPatientState();
@@ -39,16 +27,7 @@ class NewPatient extends StatefulWidget {
 
 class _NewPatientState extends State<NewPatient>
     with SingleTickerProviderStateMixin {
-  String audioPath = "";
-  late Record audioRecord;
-  late AudioPlayer audioPlayer;
-  bool isRecording = false;
   late AnimationController _controller;
-  final nameTextEditing = TextEditingController();
-  final mobileTextEditing = TextEditingController();
-  final labPriceController = TextEditingController();
-  final ageTextEditing = TextEditingController();
-  final patientActualLocationController = TextEditingController();
   TestMenuController testMenuController = Get.find();
   TestSamplesController testSamplesController =
       Get.put(TestSamplesController());
@@ -62,66 +41,23 @@ class _NewPatientState extends State<NewPatient>
   void initState() {
     print("this is a test menu");
     print(testMenuController.testMenuList.length.toString());
-    audioPlayer = AudioPlayer();
-    audioRecord = Record();
+
     super.initState();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    NewPatient.patientName != null
-        ? nameTextEditing.text = NewPatient.patientName!
-        : "";
-    NewPatient.mobileNumber != null
-        ? mobileTextEditing.text = NewPatient.mobileNumber!
-        : "";
-    NewPatient.age != null ? ageTextEditing.text = NewPatient.age! : "";
   }
 
   @override
   void dispose() {
-    audioRecord.dispose();
-    audioPlayer.dispose();
     super.dispose();
   }
 
-  Future<void> startRecording() async {
-    try {
-      if (await audioRecord.hasPermission()) {
-        await audioRecord.start();
-        setState(() {
-          isRecording = true;
-        });
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
 
-  Future<void> stopRecording() async {
-    try {
-      String? path = await audioRecord.stop();
-      setState(() {
-        isRecording = false;
-        audioPath = path!;
-      });
-      // await uploadAudioToFirebaseStorage();
-    } catch (e) {
-      print(e);
-    }
-  }
 
-  Future<void> playRecording() async {
-    try {
-      audio.Source urlSource = UrlSource(audioPath);
-      await audioPlayer.play(urlSource);
-    } catch (e) {
-      print("playing $e");
-    }
-  }
-
-  List<dynamic> selectedDataString = [];
-  List<TestMenuModel> selectedTestMenu = [];
+  // List<dynamic> selectedDataString = [];
+  // List<TestMenuModel> selectedTestMenu = [];
 
   @override
   Widget build(BuildContext context) {
@@ -148,10 +84,16 @@ class _NewPatientState extends State<NewPatient>
                       onPressed: () {
                         FocusScope.of(context).unfocus();
                         newRideController.isNewAddButtonShow.value = true;
-                        if (masterListController
-                            .masterListController.isNotEmpty) {
-                          showChoosePatients();
+                        if(newRideController.labPrice.value!=""){
+                          Get.to(()=>const SearchRiderPage());
                         }
+                        else{
+                          if (masterListController
+                              .masterListController.isNotEmpty) {
+                            showChoosePatients();
+                          }
+                        }
+
                       },
                       child: Text(
                         "Book Rider",
@@ -225,7 +167,6 @@ class _NewPatientState extends State<NewPatient>
               Obx(() => newRideController.patientLocation.value !=
                       "Enter Patient Location"
                   ? TextFormField(
-                      controller: patientActualLocationController,
                       onChanged: (value) {
                         newRideController.patientActualLocation.value = value;
                       },
@@ -387,13 +328,15 @@ class _NewPatientState extends State<NewPatient>
                               ),
                               TextFormField(
                                 maxLength: 10,
-                                controller: labPriceController,
+                                onChanged: (value) {
+                                  newRideController.labPrice.value=value;
+                                },
+                                style: const TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
                                 cursorColor: Colors.black,
                                 keyboardType: TextInputType.number,
                                 decoration: const InputDecoration(
                                   focusedBorder: OutlineInputBorder(),
                                   enabledBorder: OutlineInputBorder(),
-                                  hintText: "Eg-2250",
                                   fillColor: Color(0xFFE7E3E3),
                                   filled: true,
                                   border: InputBorder.none,
@@ -435,6 +378,7 @@ class _NewPatientState extends State<NewPatient>
                                       enabledBorder: const OutlineInputBorder(),
                                       hintText:
                                           "${distanceController.price.value}",
+                                      hintStyle: const TextStyle(color:Colors.black,fontWeight: FontWeight.bold),
                                       fillColor: const Color(0xFFE7E3E3),
                                       filled: true,
                                       border: InputBorder.none,
@@ -475,15 +419,15 @@ class _NewPatientState extends State<NewPatient>
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              if (isRecording) const Text("Recording"),
+                              if (newRideController.isRecording.value) const Text("Recording"),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       primaryColor, // Set the background color
                                 ),
-                                onPressed: isRecording
-                                    ? stopRecording
-                                    : startRecording,
+                                onPressed: newRideController.isRecording.value
+                                    ? newRideController.startRecording
+                                    : newRideController.stopRecording,
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 300),
                                   curve: Curves.easeInOut,
@@ -495,13 +439,13 @@ class _NewPatientState extends State<NewPatient>
                                             Tween<double>(begin: 1.0, end: 1.2)
                                                 .animate(_controller),
                                         child: Icon(
-                                          isRecording ? Icons.stop : Icons.mic,
+                                          newRideController.isRecording.value ? Icons.stop : Icons.mic,
                                           color: Colors.black,
                                         ),
                                       ),
                                       const SizedBox(width: 5),
                                       Text(
-                                        isRecording
+                                        newRideController.isRecording.value
                                             ? 'Stop Recording'
                                             : 'Start Recording',
                                         style: const TextStyle(
@@ -516,13 +460,13 @@ class _NewPatientState extends State<NewPatient>
                               const SizedBox(
                                 width: 5,
                               ),
-                              if (!isRecording && audioPath != null)
+                              if (!newRideController.isRecording.value && newRideController.audioPath.value != null)
                                 ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors
                                           .green, // Set the background color
                                     ),
-                                    onPressed: playRecording,
+                                    onPressed: newRideController.listenRecording,
                                     child: const Icon(
                                       Icons.speaker_phone,
                                       color: Colors.white,
@@ -927,7 +871,7 @@ class _NewPatientState extends State<NewPatient>
                             (element) => newRideController
                                 .addNewPatientFromMasterList(element));
                         priceController.price.value +=
-                            (masterListController.masterListController.length -
+                            (newRideController.patientList.length -
                                     1) *
                                 ridePriceController.minimumRidePrice.value;
                         Navigator.pop(context);

@@ -67,33 +67,13 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
                   enabledBorder: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder()),
             ),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.end,
-            //   children: [
-            //     Padding(
-            //       padding: const EdgeInsets.all(8.0),
-            //       child: ElevatedButton.icon(
-            //           onPressed: () {
-            //
-            //           },
-            //           icon: const Icon(
-            //             Icons.fmd_good_rounded,
-            //             color: Colors.red,
-            //           ),
-            //           label: Text(
-            //             "Select from map",
-            //             style: GoogleFonts.acme(),
-            //           )),
-            //     ),
-            //   ],
-            // ),
             Expanded(
               child: predictedList.isNotEmpty
                   ? ListView.builder(
                       itemCount: predictedList.length,
                       itemBuilder: (context, index) => InkWell(
                         onTap: () async {
-                          NewPatient.patientLocation =
+                          newRideController.patientLocation.value =
                               predictedList[index].main_text! +
                                   predictedList[index].secondary_id!;
                           String mapUrl =
@@ -101,7 +81,7 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
                           String apiUrl =
                               "https://maps.googleapis.com/maps/api/place/details/json?place_id=${predictedList[index].place_id!}&key=$mapUrl";
                           LatLng? result = await apiRequestForLatLng(apiUrl);
-                          NewPatient.latLng =
+                          newRideController.patientLatLng =
                               LatLng(result!.latitude, result.longitude);
                           newRideController.patientLocation.value=  predictedList[index].main_text! +
                               predictedList[index].secondary_id!;
@@ -163,7 +143,5 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
     riderCharges > ridePriceController.minimumRidePrice.value
         ? riderCharges
         : ridePriceController.minimumRidePrice.value;
-    NewPatient.riderPrice =
-        priceController.price.value.toString();
   }
 }

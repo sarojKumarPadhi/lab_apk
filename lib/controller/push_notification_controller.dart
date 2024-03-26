@@ -3,6 +3,7 @@ import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:get/get.dart';
 import 'package:jonk_lab/page/newPatient.dart';
 import '../model/active_driver_in_realtime_database.dart';
+import 'new_ride_controller.dart';
 
 class PushNotificationController extends GetxController {
   RxList<String> riderUid = <String>[].obs;
@@ -10,6 +11,7 @@ class PushNotificationController extends GetxController {
   RxList<ActiveDriverRealTimeDataBase> allOnlineDriverData =
       <ActiveDriverRealTimeDataBase>[].obs;
   RxList<String> keysRetrieved = <String>[].obs;
+  NewRideController newRideController=Get.find();
 
   @override
   onInit() {
@@ -56,7 +58,7 @@ class PushNotificationController extends GetxController {
   void getAllOnlineDriverId() {
     Geofire.initialize("activeDrivers");
     Geofire.queryAtLocation(
-            NewPatient.latLng!.latitude, NewPatient.latLng!.latitude, 10)!
+            newRideController.patientLatLng!.latitude, newRideController.patientLatLng!.latitude, 10)!
         .listen((map) {
       if (map != null) {
         var callBack = map["callBack"];

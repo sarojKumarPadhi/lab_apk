@@ -11,6 +11,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:jonk_lab/controller/new_ride_controller.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/global/globalData.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -18,13 +19,13 @@ import 'package:quickalert/quickalert.dart';
 import 'package:uuid/uuid.dart';
 import '../controller/lab_basic_details.dart';
 import '../controller/push_notification_controller.dart';
+import '../controller/rider_price_controller.dart';
 import '../controller/searching_rider_controller.dart';
 import '../model/active_nearby_available_drivers.dart';
 import '../model/direction_detail_info.dart';
 import '../service/pushNotificationService.dart';
 import '../services/networkRequest.dart';
 import 'homePage.dart';
-import 'newPatient.dart';
 
 class SearchRiderPage extends StatefulWidget {
   const SearchRiderPage({super.key});
@@ -36,9 +37,14 @@ class SearchRiderPage extends StatefulWidget {
 class _SearchRiderPageState extends State<SearchRiderPage> {
   PushNotificationService pushNotificationService = PushNotificationService();
 
-  SearchingRideController searchingRideController = Get.put(SearchingRideController());
+  SearchingRideController searchingRideController =
+      Get.put(SearchingRideController());
   LabBasicDetailsController labBasicDetailsController = Get.find();
-  PushNotificationController pushNotificationController = Get.put(PushNotificationController());
+  NewRideController newRideController = Get.find();
+  PushNotificationController pushNotificationController =
+      Get.put(PushNotificationController());
+  PriceController priceController = Get.put(PriceController());
+
   BitmapDescriptor? customMarkerLabIcon;
   BitmapDescriptor? customMarkerPatientIcon;
   BitmapDescriptor? customMarkerRiderIcon;
@@ -54,11 +60,6 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
   StreamSubscription<dynamic>? _geofireSubscription;
 
   Set<Marker> driversMarkerSet = <Marker>{};
-
-  // checkRide() async {
-  //   isRideBook = await checkLatestRide();
-  //   setState(() {});
-  // }
 
   generateOtp() {
     Random random = Random();
@@ -92,7 +93,21 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
     DatabaseReference ref =
         FirebaseDatabase.instance.ref("active_labs/$currentUid/$uId");
 
-     latestRideId = uId!;
+
+
+    List<Map<String, dynamic>> patientListJson = newRideController.patientList.map((patient) => {
+      "id": patient.id,
+      "name": patient.name,
+      "age": patient.age,
+      "gender": patient.gender,
+      "phone": patient.phone,
+      "samples": patient.samples,
+    }).toList();
+
+// Now you can include patientListJson in your data to be sent to Firebase
+
+
+    latestRideId = uId!;
     await ref.set({
       "rideStatus": "idle",
       "requestId": uId!,
@@ -111,16 +126,13 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
             .labBasicDetailsData.value.address!.geoPoint.longitude
       },
       "patientDetails": {
-        "latitude": NewPatient.latLng?.latitude,
-        "longitude": NewPatient.latLng?.longitude,
-        "name": NewPatient.patientName,
-        "phone": NewPatient.mobileNumber,
-        "age": NewPatient.age,
-        "test": NewPatient.tests,
-        "location": NewPatient.patientLocation,
+        "latitude": newRideController.patientLatLng?.latitude,
+        "longitude": newRideController.patientLatLng?.longitude,
+        "patientList": patientListJson,
+        "location": newRideController.patientActualLocation.value,
         "totalDistance": totalDistance,
-        "labPrice": NewPatient.testPrice,
-        "riderPrice": NewPatient.riderPrice,
+        "labPrice": newRideController.labPrice.value,
+        "riderPrice": priceController.price.value.toString(),
         "otp": otp!
       },
     }).then((value) async {
@@ -154,7 +166,8 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
                     .labBasicDetailsData.value.address!.geoPoint.latitude,
                 labBasicDetailsController
                     .labBasicDetailsData.value.address!.geoPoint.longitude),
-            LatLng(NewPatient.latLng!.latitude, NewPatient.latLng!.longitude));
+            LatLng(newRideController.patientLatLng!.latitude,
+                newRideController.patientLatLng!.longitude));
 
     if (directionInfoDetails != null) {
       /// initialize total distance in global variable
@@ -191,9 +204,9 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
   Widget build(BuildContext context) {
     // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-    String allTest = NewPatient.tests != null
-        ? NewPatient.tests!.join(",")
-        : "No Test Selected";
+    // String allTest = NewPatient.tests != null
+    //     ? NewPatient.tests!.join(",")
+    //     : "No Test Selected";
 
     return Scaffold(
         appBar: AppBar(
@@ -235,8 +248,10 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
                                 )
                               : Marker(
                                   markerId: const MarkerId('patient_location'),
-                                  position: LatLng(NewPatient.latLng!.latitude,
-                                      NewPatient.latLng!.longitude),
+                                  position: LatLng(
+                                      newRideController.patientLatLng!.latitude,
+                                      newRideController
+                                          .patientLatLng!.longitude),
                                   // Position of the marker
                                   infoWindow: const InfoWindow(
                                     title: 'Patient Location',
@@ -247,8 +262,10 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
                           customMarkerPatientIcon != null
                               ? Marker(
                                   markerId: const MarkerId('patient_location'),
-                                  position: LatLng(NewPatient.latLng!.latitude,
-                                      NewPatient.latLng!.longitude),
+                                  position: LatLng(
+                                      newRideController.patientLatLng!.latitude,
+                                      newRideController
+                                          .patientLatLng!.longitude),
                                   infoWindow: const InfoWindow(
                                     title: 'Patient Location',
                                   ),
@@ -257,8 +274,10 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
                                 )
                               : Marker(
                                   markerId: const MarkerId('patient_location'),
-                                  position: LatLng(NewPatient.latLng!.latitude,
-                                      NewPatient.latLng!.longitude),
+                                  position: LatLng(
+                                      newRideController.patientLatLng!.latitude,
+                                      newRideController
+                                          .patientLatLng!.longitude),
                                   infoWindow: const InfoWindow(
                                     title: 'Patient Location',
                                   ),
@@ -318,8 +337,11 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
                                       CameraUpdate.newCameraPosition(
                                           CameraPosition(
                                               target: LatLng(
-                                                  NewPatient.latLng!.latitude,
-                                                  NewPatient.latLng!.longitude),
+                                                  newRideController
+                                                      .patientLatLng!.latitude,
+                                                  newRideController
+                                                      .patientLatLng!
+                                                      .longitude),
                                               zoom: 14)));
                                 },
                               );
@@ -484,11 +506,11 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
                                           ),
                                         ),
                                         const SizedBox(height: 10),
-                                        Text(
-                                          allTest,
-                                          style: TextStyle(
-                                              fontSize: deviceWidth! * .04),
-                                        ),
+                                        // Text(
+                                        //   allTest,
+                                        //   style: TextStyle(
+                                        //       fontSize: deviceWidth! * .04),
+                                        // ),
                                       ],
                                     ),
                                   ),
@@ -506,8 +528,8 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
                                               style: GoogleFonts.acme(
                                                   fontSize:
                                                       deviceWidth! * .05)),
-                                          subtitle:
-                                              Text(NewPatient.patientLocation!),
+                                          subtitle: Text(newRideController
+                                              .patientActualLocation.value),
                                         ),
                                         Row(
                                           mainAxisAlignment:
@@ -522,17 +544,6 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
 
                                                     setState(() {});
                                                     sendDataInRealTimeDataBase();
-                                                    // showDialog(
-                                                    //   context: context,
-                                                    //   builder: (context) {
-                                                    //     return Column(
-                                                    //       children: [
-                                                    //     Text(pushNotificationController.allOnlineDriverData[0].
-                                                    //       rideStatus,)
-                                                    //     ],
-                                                    //                                                   );
-                                                    //   },
-                                                    // );
                                                   },
                                                   child: const Text("Confirm")),
                                             ),
@@ -552,7 +563,9 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
   initializeGeofireListener() async {
     Geofire.initialize("activeDrivers");
     _geofireSubscription = Geofire.queryAtLocation(
-            NewPatient.latLng!.latitude, NewPatient.latLng!.longitude, 10)!
+            newRideController.patientLatLng!.latitude,
+            newRideController.patientLatLng!.longitude,
+            10)!
         .listen((map) {
       if (map != null) {
         var callBack = map['callBack'];
