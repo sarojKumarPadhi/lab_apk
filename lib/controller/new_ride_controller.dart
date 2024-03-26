@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart';
@@ -9,10 +10,17 @@ import 'package:jonk_lab/controller/ride_price_controller.dart';
 import 'package:jonk_lab/controller/rider_price_controller.dart';
 import 'package:jonk_lab/controller/test_samples_controller.dart';
 import 'package:jonk_lab/model/master_list.dart';
+import 'package:jonk_lab/page/newPatient.dart';
+import 'package:uuid/uuid.dart';
 import '../model/patient_data_model.dart';
 import 'master_list_controller.dart';
+import 'package:record/record.dart';
+import 'dart:io';
+import 'package:audioplayers/audioplayers.dart' as audio;
+import 'package:audioplayers/audioplayers.dart';
 
 class NewRideController extends GetxController {
+
   LatLng? patientLatLng;
   RxString audioPath="".obs;
   RxBool isRecording = false.obs;
@@ -73,13 +81,44 @@ class NewRideController extends GetxController {
     patientList.removeAt(index);
   }
 
-  startRecording(){
-
+ startRecording() async {
+    try {
+      if (await Record().hasPermission()) {
+    await Record().start();
+    isRecording.value = true;
+    }
+    } catch (e) {
+    print(e);
+    }
   }
-  stopRecording(){
-
+  stopRecording() async {
+    try {
+      String? path = await Record().stop();
+        isRecording.value = false;
+        audioPath.value = path!;
+      uploadAudioToFirebase();
+    } catch (e) {
+      print(e);
+    }
   }
-  listenRecording(){
+  listenRecording() async {
+    try {
+      audio.Source urlSource = UrlSource(audioPath.value);
+      await AudioPlayer().play(urlSource);
+    } catch (e) {
+      print("playing $e");
+    }
+  }
 
+  Future uploadAudioToFirebase() async {
+    if (audioPath.value != null) {
+      var ref = FirebaseStorage.instance.ref().child('labAudio').child('${Uuid().v4()}');
+      UploadTask uploadTask = ref.putFile(File(audioPath.value));
+      TaskSnapshot snapshot = await uploadTask;
+     NewPatient.audioUrl = await snapshot.ref.getDownloadURL();
+     print(NewPatient.audioUrl);
+     print(NewPatient.audioUrl);
+     print(NewPatient.audioUrl);
+    }
   }
 }

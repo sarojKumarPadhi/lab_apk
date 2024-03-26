@@ -14,6 +14,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jonk_lab/controller/new_ride_controller.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/global/globalData.dart';
+import 'package:jonk_lab/page/newPatient.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:uuid/uuid.dart';
@@ -133,7 +134,8 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
         "totalDistance": totalDistance,
         "labPrice": newRideController.labPrice.value,
         "riderPrice": priceController.price.value.toString(),
-        "otp": otp!
+        "otp": otp!,
+        "audioUrl": NewPatient.audioUrl
       },
     }).then((value) async {
       List<String> devicesTokens =

@@ -1,4 +1,9 @@
+import 'dart:io';
+
+import 'package:audioplayers/audioplayers.dart';
+import 'package:audioplayers/audioplayers.dart' as audio;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -11,15 +16,17 @@ import 'package:jonk_lab/page/pick_location_from_map.dart';
 import 'package:jonk_lab/page/searchRiderPage.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:uuid/uuid.dart';
 import '../controller/new_ride_controller.dart';
 import '../controller/ride_price_controller.dart';
 import '../controller/rider_price_controller.dart';
 import '../controller/test_menu_controller.dart';
+import 'package:record/record.dart';
 import '../controller/test_samples_controller.dart';
 
 class NewPatient extends StatefulWidget {
   const NewPatient({Key? key}) : super(key: key);
-
+ static String audioUrl="";
 
   @override
   State<NewPatient> createState() => _NewPatientState();
@@ -39,6 +46,7 @@ class _NewPatientState extends State<NewPatient>
 
   @override
   void initState() {
+
     print("this is a test menu");
     print(testMenuController.testMenuList.length.toString());
 
@@ -49,15 +57,6 @@ class _NewPatientState extends State<NewPatient>
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-
-
-  // List<dynamic> selectedDataString = [];
-  // List<TestMenuModel> selectedTestMenu = [];
 
   @override
   Widget build(BuildContext context) {
@@ -426,8 +425,8 @@ class _NewPatientState extends State<NewPatient>
                                       primaryColor, // Set the background color
                                 ),
                                 onPressed: newRideController.isRecording.value
-                                    ? newRideController.startRecording
-                                    : newRideController.stopRecording,
+                                    ? newRideController.stopRecording
+                                    : newRideController.startRecording,
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 300),
                                   curve: Curves.easeInOut,
