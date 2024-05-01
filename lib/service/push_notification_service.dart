@@ -1,13 +1,9 @@
 import 'dart:convert';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
-
-import '../page/after_ride_accept_by_rider.dart';
 
 class PushNotificationService {
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
@@ -94,9 +90,6 @@ class PushNotificationService {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   Future initializeCloudMessaging(BuildContext context) async {
-
-
-
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage? remoteMessage) {
@@ -110,13 +103,10 @@ class PushNotificationService {
         }
         print("App opened from background with notification");
         print(remoteMessage.data);
-
       }
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage remoteMessage) {
-
-
       print("App opened from background with notification");
       print(remoteMessage.data);
       if (remoteMessage.data["notificationType"] == "ride") {
@@ -126,20 +116,19 @@ class PushNotificationService {
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage remoteMessage) {
-
       print("App opened from background with notification");
       print(remoteMessage.data);
       if (remoteMessage.data["notificationType"] == "ride") {
         readLabRideRequestInformation(remoteMessage.data["rideRequestId"],
             context, remoteMessage.data["labUid"]);
       }
-
     });
   }
 
-  readLabRideRequestInformation(String requestId, BuildContext context, String labUid) {
-    Get.offAll(
-            () => AfterAcceptanceRidePage(requestId: requestId, labUid: labUid)
-    );
+  readLabRideRequestInformation(
+      String requestId, BuildContext context, String labUid) {
+    // Get.offAll(
+    //         () => AfterAcceptanceRidePage(requestId: requestId, labUid: labUid)
+    // );
   }
 }

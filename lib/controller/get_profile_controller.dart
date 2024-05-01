@@ -20,7 +20,7 @@ class GetProfileImageController extends GetxController {
         .get()
         .then((DocumentSnapshot snapshot) {
       Map<String, dynamic> mapData = snapshot.data() as Map<String, dynamic>;
-      profileUrl.value = mapData["profileImage"];
+      profileUrl.value = mapData["profileImage"]??"";
     });
   }
 }

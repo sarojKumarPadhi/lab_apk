@@ -16,15 +16,13 @@ class TestMenuController extends GetxController {
     await FirebaseFirestore.instance
         .collection("admin")
         .doc(auth)
-        .collection("samples")
+        .collection("test")
+        .doc("1hJ7bmPKIEpNlhnY7L4J")
         .get()
-        .then((QuerySnapshot snapshot) {
-      for (DocumentSnapshot snapshot in snapshot.docs) {
-        Map<String, dynamic> mapData = snapshot.data() as Map<String, dynamic>;
-        testMenuList.add(TestMenuModel.fromJson(mapData));
-      }
+        .then((DocumentSnapshot snapshot) {
+      Map<String, dynamic> mapData = snapshot.data() as Map<String, dynamic>;
+      testMenuList.addAll(
+          (mapData["samples"] as List).map((e) => TestMenuModel.fromJson(e)));
     });
   }
-
-
 }

@@ -16,12 +16,12 @@ class MasterListModel {
 
   factory MasterListModel.fromJson(Map<String, dynamic> json) {
     return MasterListModel(
-      id: json["customerId"],
-      name: json["name"],
-      age: json["age"],
-      gender: json["gender"],
-      phone: json["phoneNumber"],
-      samples:List.from( json["samples"]),
+      id: json["customerId"]??"404",
+      name: json["name"]??"Amit",
+      age: json["age"]??"25",
+      gender: json["gender"]??"male",
+      phone: json["phoneNumber"]??"8210109466",
+      samples:List.from( json["samples"]??[]),
     );
   }
 }

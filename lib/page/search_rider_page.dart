@@ -14,19 +14,21 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jonk_lab/controller/new_ride_controller.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/global/globalData.dart';
-import 'package:jonk_lab/page/newPatient.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:uuid/uuid.dart';
 import '../controller/lab_basic_details.dart';
+import '../controller/listen_accepted_ride_controller.dart';
 import '../controller/push_notification_controller.dart';
 import '../controller/rider_price_controller.dart';
 import '../controller/searching_rider_controller.dart';
+import '../controller/test_samples_controller.dart';
 import '../model/active_nearby_available_drivers.dart';
 import '../model/direction_detail_info.dart';
-import '../service/pushNotificationService.dart';
+import '../service/push_notification_service.dart';
 import '../services/networkRequest.dart';
 import 'homePage.dart';
+import 'new_patient.dart';
 
 class SearchRiderPage extends StatefulWidget {
   const SearchRiderPage({super.key});
@@ -37,7 +39,6 @@ class SearchRiderPage extends StatefulWidget {
 
 class _SearchRiderPageState extends State<SearchRiderPage> {
   PushNotificationService pushNotificationService = PushNotificationService();
-
   SearchingRideController searchingRideController =
       Get.put(SearchingRideController());
   LabBasicDetailsController labBasicDetailsController = Get.find();
@@ -45,10 +46,13 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
   PushNotificationController pushNotificationController =
       Get.put(PushNotificationController());
   PriceController priceController = Get.put(PriceController());
-
+  TestSamplesController testSamplesController = Get.find();
   BitmapDescriptor? customMarkerLabIcon;
   BitmapDescriptor? customMarkerPatientIcon;
   BitmapDescriptor? customMarkerRiderIcon;
+
+  ListenAcceptedRideController listenAcceptedRideController =
+      Get.put(ListenAcceptedRideController());
 
   List<LatLng> pLineCoordinatesList = [];
   Set<Polyline> polyLineSet = {};
@@ -57,22 +61,14 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
   Timer? _timer;
   String? uId;
   bool? isRideBook;
-  String? otp;
-  StreamSubscription<dynamic>? _geofireSubscription;
 
+  StreamSubscription<dynamic>? _geofireSubscription;
   Set<Marker> driversMarkerSet = <Marker>{};
 
-  generateOtp() {
-    Random random = Random();
-    int generatedOtp = random.nextInt(900000) + 100000;
-    otp = generatedOtp.toString();
-    print("this is otp : ${otp!}");
-  }
 
   @override
   void initState() {
     initializeGeofireListener();
-    generateOtp();
     super.initState();
     getPolyline();
     createCustomMarker();
@@ -87,31 +83,31 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
       }
     });
   }
-
+  Future<DateTime> date() async {
+    DateTime dateTime = DateTime.now();
+    return dateTime;
+  }
   sendDataInRealTimeDataBase() async {
     String? deviceToken = await FirebaseMessaging.instance.getToken();
     String currentUid = FirebaseAuth.instance.currentUser!.uid;
     DatabaseReference ref =
         FirebaseDatabase.instance.ref("active_labs/$currentUid/$uId");
-
-
-
-    List<Map<String, dynamic>> patientListJson = newRideController.patientList.map((patient) => {
-      "id": patient.id,
-      "name": patient.name,
-      "age": patient.age,
-      "gender": patient.gender,
-      "phone": patient.phone,
-      "samples": patient.samples,
-    }).toList();
-
+    List<Map<String, dynamic>> patientListJson = newRideController.patientListAfterSelection
+        .map((patient) => {
+              "id": patient.id,
+              "name": patient.name,
+              "age": patient.age,
+              "gender": patient.gender,
+              "phone": patient.phone,
+              "samples": List.from(patient.sampleList).toList()
+            })
+        .toList();
 // Now you can include patientListJson in your data to be sent to Firebase
-
-
     latestRideId = uId!;
     await ref.set({
       "rideStatus": "idle",
       "requestId": uId!,
+      "dateTime": (await date()).toString(),
       "labDetails": {
         "phoneNumber": labBasicDetailsController
             .labBasicDetailsData.value.phoneNumber
@@ -131,10 +127,10 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
         "longitude": newRideController.patientLatLng?.longitude,
         "patientList": patientListJson,
         "location": newRideController.patientActualLocation.value,
+        "patientLocation": newRideController.patientLocation.value,
         "totalDistance": totalDistance,
         "labPrice": newRideController.labPrice.value,
         "riderPrice": priceController.price.value.toString(),
-        "otp": otp!,
         "audioUrl": NewPatient.audioUrl
       },
     }).then((value) async {
@@ -144,7 +140,7 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
           tokens: devicesTokens,
           rideRequestId: latestRideId!,
           labUid: currentUid);
-      HomePageState.sendOTP(otp!);
+
     });
   }
 
@@ -205,10 +201,6 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
   @override
   Widget build(BuildContext context) {
     // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-
-    // String allTest = NewPatient.tests != null
-    //     ? NewPatient.tests!.join(",")
-    //     : "No Test Selected";
 
     return Scaffold(
         appBar: AppBar(
@@ -482,10 +474,12 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
                                 FadeInLeft(
                                   child: Container(
                                     width: deviceWidth! * .8,
-                                    padding: EdgeInsets.all(16),
+                                    height: deviceHeight! * .2,
+                                    padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.black87,
+                                      borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(10)),
                                       boxShadow: [
                                         BoxShadow(
                                           color: Colors.grey.withOpacity(0.5),
@@ -496,24 +490,24 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
                                         ),
                                       ],
                                     ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "All Tests:",
-                                          style: TextStyle(
-                                            fontSize: deviceWidth! * .05,
-                                            fontWeight: FontWeight.bold,
+                                    child: ListView.builder(
+                                      itemCount: newRideController.patientListAfterSelection.length,
+                                      itemBuilder: (context, index) {
+                                        return ListTile(
+                                          title: Text(
+                                            newRideController.patientListAfterSelection[index].name!,
+                                            style: GoogleFonts.acme(
+                                                color: Colors.white,
+                                                fontSize: deviceWidth! * .06),
                                           ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        // Text(
-                                        //   allTest,
-                                        //   style: TextStyle(
-                                        //       fontSize: deviceWidth! * .04),
-                                        // ),
-                                      ],
+                                          subtitle:Text(
+                                            newRideController.patientListAfterSelection[index].sampleList!.join(','),
+                                            style: GoogleFonts.acme(
+                                                color: Colors.white,
+                                                fontSize: deviceWidth! * .04),
+                                          ) ,
+                                        );
+                                      },
                                     ),
                                   ),
                                 ),
@@ -521,6 +515,7 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
                                   child: Container(
                                     color: Colors.white,
                                     width: deviceWidth,
+                                    height: deviceHeight! * .2,
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
@@ -543,9 +538,11 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
                                               child: ElevatedButton(
                                                   onPressed: () {
                                                     isRideBook = true;
-
                                                     setState(() {});
                                                     sendDataInRealTimeDataBase();
+
+                                                    listenAcceptedRideController
+                                                        .listenDataMethod();
                                                   },
                                                   child: const Text("Confirm")),
                                             ),
@@ -669,10 +666,10 @@ class _SearchRiderPageState extends State<SearchRiderPage> {
             TextButton(
               onPressed: () async {
                 try {
+                  String labUid = FirebaseAuth.instance.currentUser!.uid;
                   await FirebaseDatabase.instance
                       .ref()
-                      .child("active_labs")
-                      .child(latestRideId!)
+                      .child("active_labs/$labUid/$latestRideId")
                       .remove()
                       .then((value) {
                     Get.offAll(() => const HomePage());

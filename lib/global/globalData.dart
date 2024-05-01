@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 String? phoneNumber;
 String? verificationToken;
-String? otp;
 double registrationPercentage = 0.15;
 double? deviceWidth;
 double? deviceHeight;

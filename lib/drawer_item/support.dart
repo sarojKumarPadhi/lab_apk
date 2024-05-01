@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,7 +12,6 @@ import 'package:intl/intl.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/global/globalData.dart';
 import 'package:jonk_lab/global/shimmer.dart';
-
 import '../controller/chat_controller.dart';
 import '../global/progressIndicator.dart';
 

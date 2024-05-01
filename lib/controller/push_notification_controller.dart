@@ -1,7 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:get/get.dart';
-import 'package:jonk_lab/page/newPatient.dart';
 import '../model/active_driver_in_realtime_database.dart';
 import 'new_ride_controller.dart';
 

@@ -3,7 +3,7 @@
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
 //
 // import '../global/globalData.dart';
-// import '../page/newPatient.dart';
+// import '../page/new_patient.dart';
 //
 // Future<bool> checkLatestRide() async {
 //   final DatabaseReference databaseReference = FirebaseDatabase.instance

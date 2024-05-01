@@ -4,8 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/global/globalData.dart';
-import 'package:jonk_lab/page/newPatient.dart';
-import 'package:jonk_lab/page/pick_location_from_map.dart';
+
 import '../controller/lab_basic_details.dart';
 import '../controller/new_ride_controller.dart';
 import '../controller/ride_price_controller.dart';
@@ -44,8 +43,11 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
               onChanged: (value) async {
                 if (value.isNotEmpty) {
                   String mapKey = "AIzaSyCudnOm2h7hs1412HqGRn58uFpLn6Pdw18";
+                  String? location =
+                      "${labBasicDetailsController.labBasicDetailsData.value.address?.geoPoint.latitude.toString()},${labBasicDetailsController.labBasicDetailsData.value.address?.geoPoint.longitude.toString()}"; // Latitude and longitude of Delhi (you can use any location within Delhi)
+                  int radiusInMeters = 20000;
                   String apiUrl =
-                      "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$value&key=$mapKey&components=country:IN";
+                      "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$value&key=$mapKey&components=country:IN&location=$location&radius=$radiusInMeters";
                   var result = await apiRequest(apiUrl);
                   if (result != "response error") {
                     List<PredictedPlaces> listData = (result["predictions"]
@@ -57,8 +59,7 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
                   }
                 } else {
                   predictedList.clear();
-                  setState(() {}
-                  );
+                  setState(() {});
                 }
               },
               decoration: const InputDecoration(
@@ -83,8 +84,9 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
                           LatLng? result = await apiRequestForLatLng(apiUrl);
                           newRideController.patientLatLng =
                               LatLng(result!.latitude, result.longitude);
-                          newRideController.patientLocation.value=  predictedList[index].main_text! +
-                              predictedList[index].secondary_id!;
+                          newRideController.patientLocation.value =
+                              predictedList[index].main_text! +
+                                  predictedList[index].secondary_id!;
                           print(result.toString());
                           await getDistanceBetweenPoints(
                               LatLng(result.latitude, result.longitude));
@@ -137,11 +139,11 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
         ? ridePriceController.timeZonePrice.value.day
         : ridePriceController.timeZonePrice.value.night;
     int riderCharges =
-    (directionInfoDetails!.distance_value! ~/ 1000 * kmPrice);
+        (directionInfoDetails!.distance_value! ~/ 1000 * kmPrice);
 
     priceController.price.value =
-    riderCharges > ridePriceController.minimumRidePrice.value
-        ? riderCharges
-        : ridePriceController.minimumRidePrice.value;
+        riderCharges > ridePriceController.minimumRidePrice.value
+            ? riderCharges
+            : ridePriceController.minimumRidePrice.value;
   }
 }

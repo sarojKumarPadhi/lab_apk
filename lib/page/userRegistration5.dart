@@ -1,27 +1,24 @@
 import 'dart:io';
-
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jonk_lab/global/color.dart';
-
 import '../global/globalData.dart';
 import '../global/progressIndicator.dart';
 import '../global/reviewAlert.dart';
 
+
+
 class UserRegistration5 extends StatefulWidget {
   const UserRegistration5({super.key});
-
   @override
   State<UserRegistration5> createState() => _UserRegistration5State();
 }
-
 class _UserRegistration5State extends State<UserRegistration5> {
   GetStorage getStorage = GetStorage();
   final ImagePicker imagePicker = ImagePicker();
-
   imagePickerMethod(ImageSource source, String documentType) async {
     final pickedImage =
         await imagePicker.pickImage(source: source, imageQuality: 20);
@@ -54,14 +51,12 @@ class _UserRegistration5State extends State<UserRegistration5> {
       }
     }
   }
-
   bool areAllImageSelected() {
     return getStorage.read("picture1") != null &&
         getStorage.read("picture2") != null &&
         getStorage.read("picture3") != null &&
         getStorage.read("picture4") != null;
   }
-
   @override
   Widget build(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
@@ -85,9 +80,9 @@ class _UserRegistration5State extends State<UserRegistration5> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Text("Picture 1 *",
+                   Text("Picture 1* \n (inner)",
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: deviceWidth*.045,
                           color: Colors.black,
                           fontWeight: FontWeight.bold)),
                   InkWell(
@@ -130,9 +125,9 @@ class _UserRegistration5State extends State<UserRegistration5> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Text("Picture 2*",
+                   Text("Picture 2* \n(inner)",
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: deviceWidth*.045,
                           color: Colors.black,
                           fontWeight: FontWeight.bold)),
                   InkWell(
@@ -175,9 +170,9 @@ class _UserRegistration5State extends State<UserRegistration5> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Text("Picture 3*",
+                   Text("Picture 3* \n(outer)",
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: deviceWidth*.045,
                           color: Colors.black,
                           fontWeight: FontWeight.bold)),
                   InkWell(
@@ -220,9 +215,9 @@ class _UserRegistration5State extends State<UserRegistration5> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Text("Picture 4*",
+                   Text("Picture 4* \n(outer)",
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: deviceWidth*.045,
                           color: Colors.black,
                           fontWeight: FontWeight.bold)),
                   InkWell(

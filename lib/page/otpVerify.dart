@@ -1,9 +1,14 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gif_view/gif_view.dart';
 import 'package:jonk_lab/global/globalData.dart';
 import 'package:jonk_lab/page/mobileNumber.dart';
+import 'package:otp_text_field/otp_field.dart';
+import 'package:otp_text_field/style.dart';
 import 'package:pinput/pinput.dart';
+import 'package:sms_autofill/sms_autofill.dart';
+import 'package:telephony/telephony.dart';
 
 import '../auth/sendOtp.dart';
 import '../auth/verifyOtp.dart';
@@ -20,11 +25,14 @@ class OtpVerify extends StatefulWidget {
 class OtpVerifyState extends State<OtpVerify> {
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController pinController = TextEditingController();
+  String otpVariable='';
+  Telephony telephony = Telephony.instance;
+ final OtpFieldController otpBoxController = OtpFieldController();
 
   @override
   initState() {
     super.initState();
+    _listenSmsCode();
     Future.delayed(
       const Duration(
         seconds: 2,
@@ -34,6 +42,35 @@ class OtpVerifyState extends State<OtpVerify> {
       },
     );
   }
+
+  @override
+  void dispose() {
+    SmsAutoFill().unregisterListener();
+    super.dispose();
+  }
+
+  _listenSmsCode() async {
+    telephony.listenIncomingSms(
+      onNewMessage: (SmsMessage message) {
+        print(message.address);
+        print(message.body);
+
+        String sms = message.body.toString();
+        if (message.body!.contains('verification')) {
+
+          String otpcode = sms.replaceAll(new RegExp(r'[^0-9]'), '');
+          otpBoxController.set(otpcode.split(""));
+
+          setState(() {
+          });
+        } else {
+          print("error");
+        }
+      },
+      listenInBackground: false,
+    );
+  }
+
 
   snackBar() {
     Get.snackbar(
@@ -116,37 +153,42 @@ class OtpVerifyState extends State<OtpVerify> {
               ),
               Form(
                 key: _formKey,
-                child: Pinput(
-                  controller: pinController,
-                  keyboardType: TextInputType.phone,
-                  length: 6,
-                  toolbarEnabled: false,
-                  showCursor: true,
-                  pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
-                  textInputAction: TextInputAction.next,
-                  defaultPinTheme: PinTheme(
-                      height: width * 13 / 100,
-                      width: width * 13 / 100,
-                      textStyle: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.black,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 1, // Adjust the border width as needed
-                        ),
-                      )),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return "Enter OTP";
-                    }
-                    if (value.length < 6) {
-                      return "Enter a Valid OTP";
-                    }
-                    return null;
-                  },
+                child: FadeInUp(
+                  duration: const Duration(milliseconds: 3000),
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        right: deviceWidth! * 0.027, left: deviceWidth! * 0.027),
+                    child: OTPTextField(
+                      outlineBorderRadius: 10,
+                      controller: otpBoxController,
+                      length: 6,
+                      width: MediaQuery.of(context).size.width,
+                      fieldWidth: 50,
+                      style: TextStyle(fontSize: 17),
+                      textFieldAlignment: MainAxisAlignment.spaceAround,
+                      fieldStyle: FieldStyle.box,
+                      onChanged: (value) {
+                        if (value.length==6){
+                          otpVariable=value;
+                        }
+                      },
+                      onCompleted: (pin) {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) {
+                            return const CircularProgress();
+                          },
+                        );
+                        if(pin.length==6){
+                          verifyOtp(context,pin);
+                        }
+
+                      },
+
+
+                    ),
+                  ),
                 ),
               ),
               Row(
@@ -189,8 +231,8 @@ class OtpVerifyState extends State<OtpVerify> {
                         Future.delayed(
                           const Duration(milliseconds: 2000),
                           () {
-                            otp = pinController.text;
-                            verifyOtp(context);
+
+                            verifyOtp(context,otpVariable);
                           },
                         );
                       }

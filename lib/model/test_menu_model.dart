@@ -1,16 +1,20 @@
 class TestMenuModel {
-  String testSampleName;
-  String imageUrl;
+  final String? category;
+  final String? imageUrl;
+  final List<String>? subCategories;
 
-  TestMenuModel({
-    required this.imageUrl,
-    required this.testSampleName,
-  });
+  TestMenuModel({this.imageUrl, this.category, this.subCategories});
 
   factory TestMenuModel.fromJson(Map<String, dynamic> json) {
+    List<String>? subCategoriesList =
+        json["subCategory"] != null && json["subCategory"] is List
+            ? List<String>.from(json["subCategory"])
+            : [];
+
     return TestMenuModel(
-      testSampleName: json["sampleName"] ?? "testSampleName",
-      imageUrl: json["iconLink"] ?? "testPrice",
+      imageUrl: json["icon"] ?? "xyz",
+      category: json["category"] ?? "",
+      subCategories: subCategoriesList,
     );
   }
 }

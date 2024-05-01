@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 
-import '../page/newPatient.dart';
 
 class TestSamplesController extends GetxController {
   RxList<String> testSamples = <String>[].obs;
+
 
   addSample(String sampleName) {
     if (testSamples.contains(sampleName)) {
@@ -12,5 +12,7 @@ class TestSamplesController extends GetxController {
       testSamples.add(sampleName);
 
     }
+
   }
+
 }

@@ -4,23 +4,13 @@ import 'package:get/get.dart';
 import 'package:jonk_lab/global/globalData.dart';
 import 'package:jonk_lab/global/sucessAlert.dart';
 
-import '../page/otpVerify.dart';
-
-verifyOtp(BuildContext context) async {
+verifyOtp(BuildContext context, String otpByInput) async {
   try {
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: verificationToken!, smsCode: otp!);
-
+        verificationId: verificationToken!, smsCode: otpByInput);
     await FirebaseAuth.instance.signInWithCredential(credential);
-    // Get.offAll(() => const UserRegistration(),
-    //     transition: Transition.leftToRight,
-    //     duration: const Duration(milliseconds: 400));
-    // GetStorage auth=GetStorage();
-    // auth.write("auth", FirebaseAuth.instance.currentUser!.uid);
     successAlert(context);
   } catch (e) {
-    OtpVerifyState otpVerifyState = OtpVerifyState();
-    otpVerifyState.pinController.clear();
     Navigator.pop(context);
 
     Get.snackbar(

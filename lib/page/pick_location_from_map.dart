@@ -4,13 +4,12 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jonk_lab/controller/lab_basic_details.dart';
 import 'package:jonk_lab/global/color.dart';
-import 'package:jonk_lab/page/newPatient.dart';
-
 import '../controller/new_ride_controller.dart';
 import '../controller/ride_price_controller.dart';
 import '../controller/rider_price_controller.dart';
 import '../model/direction_detail_info.dart';
 import '../services/networkRequest.dart';
+import 'new_patient.dart';
 
 class PickLocationFromMap extends StatefulWidget {
   const PickLocationFromMap({Key? key}) : super(key: key);

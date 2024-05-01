@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
-
 import '../model/chatModel.dart';
 
 class GetAllChatController extends GetxController {
@@ -27,8 +26,8 @@ class GetAllChatController extends GetxController {
         .doc(docId)
         .collection("messages")
         .orderBy("timeStamp",
-            descending:
-                false) // Order messages by timeStamp in descending order
+        descending:
+        false) // Order messages by timeStamp in descending order
         .snapshots();
     Set<String> allIds = <String>{};
     snapshot.listen((QuerySnapshot snapshot) {

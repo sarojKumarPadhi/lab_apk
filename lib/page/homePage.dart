@@ -1,11 +1,9 @@
-import 'package:badges/badges.dart' as badges;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,21 +11,19 @@ import 'package:jonk_lab/drawer_item/profile/lab_profile.dart';
 import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/global/globalData.dart';
 import 'package:jonk_lab/global/logout.dart';
-import 'package:jonk_lab/page/newPatient.dart';
-import 'package:jonk_lab/page/trackSample.dart';
+import 'package:jonk_lab/page/revenue.dart';
+import 'package:jonk_lab/page/track_sample.dart';
 import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 import '../controller/get_profile_controller.dart';
 import '../controller/lab_basic_details.dart';
 import '../controller/test_menu_controller.dart';
 import '../controller/update_profile_controller.dart';
 import '../drawer_item/Support.dart';
 import '../drawer_item/master_list.dart';
-import '../drawer_item/payment/Earnings_Screen.dart';
-import '../service/pushNotificationService.dart';
+import '../service/push_notification_service.dart';
 import '../services/email_service.dart';
-import 'notificationPage.dart';
+import 'new_patient.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -48,7 +44,7 @@ class HomePageState extends State<HomePage> {
       Get.put(GetProfileImageController());
 
   TestMenuController testMenuController = Get.put(TestMenuController());
-  static const platform = MethodChannel("methodChannel");
+  // static const platform = MethodChannel("methodChannel");
   Future<void> newDeviceToken() async {
     String? deviceToken = await firebaseMessaging.getToken();
     print("this is device token : $deviceToken");
@@ -76,42 +72,13 @@ class HomePageState extends State<HomePage> {
     return false;
   }
 
-  static Future<void> sendSms(String number, String otp) async {
-    try {
-      final String status = await platform
-          .invokeMethod("sendSms", {"number": number, "otp": otp});
-      // Handle the status string if needed
-      print("SMS Status: $status");
-    } catch (e) {
-      // Handle any exceptions that occur during the invocation
-      print("Error sending SMS: $e");
-    }
-  }
 
-  /// send otp using email address
-  static void sendOTP(String otp) {
-    final emailService = EmailService(
-      username: 'chanchalskylabstech@gmail.com',
-      password: 'yfnnhzotieafpxws',
-    );
 
-    emailService.sendEmail(
-      "amitkumar.edugaon@gmail.com",
-      'Your OTP for Verification',
-      'Your OTP is: $otp',
-    );
-
-    emailService.sendEmail(
-      "prathamlabs801@gmail.com",
-      'Your OTP for Verification',
-      'Your OTP is: $otp',
-    );
-  }
 
   Future<void> requestSmsPermission() async {
     if (await Permission.sms.request().isGranted) {
       // Permission is already granted, proceed with sending SMS
-      sendSms("8210109466", "2345678");
+      // sendSms("8210109466", "2345678");
     } else {
       // Permission has not been granted yet. Request it.
       if (await Permission.sms.request().isGranted) {
@@ -137,24 +104,24 @@ class HomePageState extends State<HomePage> {
           appBar: AppBar(
             iconTheme: const IconThemeData(color: Colors.white),
             backgroundColor: appBarColor,
-            actions: [
-              InkWell(
-                onTap: () {
-                  Get.to(() => const NotificationPage());
-                },
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: deviceWidth! * .06),
-                  child: badges.Badge(
-                    badgeContent:
-                        Text('0', style: GoogleFonts.acme(color: Colors.white)),
-                    child: Icon(
-                      Icons.notification_important_rounded,
-                      size: deviceWidth! * .1,
-                    ),
-                  ),
-                ),
-              )
-            ],
+            // actions: [
+            //   InkWell(
+            //     onTap: () {
+            //       Get.to(() => const NotificationPage());
+            //     },
+            //     child: Padding(
+            //       padding: EdgeInsets.symmetric(horizontal: deviceWidth! * .06),
+            //       child: badges.Badge(
+            //         badgeContent:
+            //             Text('0', style: GoogleFonts.acme(color: Colors.white)),
+            //         child: Icon(
+            //           Icons.notification_important_rounded,
+            //           size: deviceWidth! * .1,
+            //         ),
+            //       ),
+            //     ),
+            //   )
+            // ],
           ),
           drawer: Drawer(
             child: ListView(
@@ -310,7 +277,7 @@ class HomePageState extends State<HomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => EarningsScreen(),
+                          builder: (context) => MyRideScreen(userUid: FirebaseAuth.instance.currentUser!.uid,),
                         ));
                   },
                 ),
@@ -461,7 +428,7 @@ class HomePageState extends State<HomePage> {
                                         child: Row(
                                           children: [
                                             Text(
-                                              "New \nSample \nPath",
+                                              "Home \nCollection \nBooking",
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: height / 40,
@@ -524,13 +491,22 @@ class HomePageState extends State<HomePage> {
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.only(left: 8),
-                                        child: Row(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "Track \nSample \nPath",
+                                              "Track",
                                               style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: height / 40,
+                                                  fontSize: deviceWidth!*.05,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              "PHLEBOTOMISTS",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: deviceWidth!*.04,
                                                   fontWeight: FontWeight.bold),
                                             ),
                                           ],

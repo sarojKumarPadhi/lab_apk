@@ -1,10 +1,10 @@
 class PatientDataModel {
-  String? id;
-  String? name;
-  String? age;
-  String? gender;
-  String? phone;
-  List<String>? samples;
+  String id;
+  String name;
+  String age;
+  String gender;
+  String phone;
+  List<String> sampleList;
 
   PatientDataModel(
       {required this.id,
@@ -12,16 +12,8 @@ class PatientDataModel {
         required this.age,
         required this.gender,
         required this.phone,
-        required this.samples});
+        required this.sampleList
+      });
 
-  factory PatientDataModel.fromJson(Map<String, dynamic> json) {
-    return PatientDataModel(
-      id: json["customerId"],
-      name: json["name"],
-      age: json["age"],
-      gender: json["gender"],
-      phone: json["phoneNumber"],
-      samples:List.from( json["samples"]),
-    );
-  }
+
 }

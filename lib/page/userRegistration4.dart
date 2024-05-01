@@ -73,8 +73,7 @@ class _UserRegistration4State extends State<UserRegistration4> {
 
   @override
   Widget build(BuildContext context) {
-    double deviceHeight = MediaQuery.of(context).size.height;
-    double deviceWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
@@ -87,16 +86,16 @@ class _UserRegistration4State extends State<UserRegistration4> {
           children: [
             linearProgress(),
             SizedBox(
-              height: deviceHeight * .03,
+              height: deviceHeight! * .03,
             ),
             FadeInUp(
               duration: const Duration(milliseconds: 2000),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Text("Aadhar Card *",
+                   Text("Clinic Establishment\n Certificate *",
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: deviceWidth!*.04,
                           color: Colors.black,
                           fontWeight: FontWeight.bold)),
                   InkWell(
@@ -106,8 +105,8 @@ class _UserRegistration4State extends State<UserRegistration4> {
                     child: CustomPaint(
                       painter: DashedBorderPainter(),
                       child: Container(
-                          height: deviceHeight * 14 / 100,
-                          width: deviceWidth * 30 / 100,
+                          height: deviceHeight! * 14 / 100,
+                          width: deviceWidth! * 30 / 100,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5),
                             color: const Color(0xFFE7E3E3),
@@ -133,16 +132,16 @@ class _UserRegistration4State extends State<UserRegistration4> {
               ),
             ),
             SizedBox(
-              height: deviceHeight * .02,
+              height: deviceHeight! * .02,
             ),
             FadeInUp(
               duration: const Duration(milliseconds: 2000),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Text("     Pan Card *",
+                   Text("Pan Card / GST *",
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: deviceWidth!*.04,
                           color: Colors.black,
                           fontWeight: FontWeight.bold)),
                   InkWell(
@@ -152,8 +151,8 @@ class _UserRegistration4State extends State<UserRegistration4> {
                     child: CustomPaint(
                       painter: DashedBorderPainter(),
                       child: Container(
-                          height: deviceHeight * 14 / 100,
-                          width: deviceWidth * 30 / 100,
+                          height: deviceHeight! * 14 / 100,
+                          width: deviceWidth! * 30 / 100,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5),
                             color: const Color(0xFFE7E3E3),
@@ -179,16 +178,16 @@ class _UserRegistration4State extends State<UserRegistration4> {
               ),
             ),
             SizedBox(
-              height: deviceHeight * .02,
+              height: deviceHeight! * .02,
             ),
             FadeInUp(
               duration: const Duration(milliseconds: 2000),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Text("Bank Passbook *",
+                   Text("Bank Passbook \n Cancel Cheque",
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: deviceWidth!*.04,
                           color: Colors.black,
                           fontWeight: FontWeight.bold)),
                   InkWell(
@@ -198,8 +197,8 @@ class _UserRegistration4State extends State<UserRegistration4> {
                     child: CustomPaint(
                       painter: DashedBorderPainter(),
                       child: Container(
-                          height: deviceHeight * 15 / 100,
-                          width: deviceWidth * 30 / 100,
+                          height: deviceHeight! * 15 / 100,
+                          width: deviceWidth! * 30 / 100,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5),
                             color: const Color(0xFFE7E3E3),
@@ -225,14 +224,14 @@ class _UserRegistration4State extends State<UserRegistration4> {
               ),
             ),
             SizedBox(
-              height: deviceHeight * .02,
+              height: deviceHeight! * .02,
             ),
             FadeInUp(
               duration: const Duration(milliseconds: 2000),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Text("Lab Certificate *",
+                  const Text("Lab Registration \n Certificate *",
                       style: TextStyle(
                           fontSize: 15,
                           color: Colors.black,
@@ -244,8 +243,8 @@ class _UserRegistration4State extends State<UserRegistration4> {
                     child: CustomPaint(
                       painter: DashedBorderPainter(),
                       child: Container(
-                          height: deviceHeight * 15 / 100,
-                          width: deviceWidth * 30 / 100,
+                          height: deviceHeight! * 15 / 100,
+                          width: deviceWidth! * 30 / 100,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5),
                             color: const Color(0xFFE7E3E3),
@@ -271,13 +270,13 @@ class _UserRegistration4State extends State<UserRegistration4> {
               ),
             ),
             SizedBox(
-              height: deviceHeight * .05,
+              height: deviceHeight! * .05,
             ),
             FadeInUp(
               duration: const Duration(milliseconds: 2000),
               child: SizedBox(
-                width: deviceWidth - 50,
-                height: deviceHeight * .06,
+                width: deviceWidth! - 50,
+                height: deviceHeight! * .06,
                 child: ElevatedButton(
                   onPressed: () {
                     if (areAllImagesSelected()) {
