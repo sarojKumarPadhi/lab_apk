@@ -272,13 +272,28 @@ class HomePageState extends State<HomePage> {
                     Icons.payment,
                     color: Colors.black,
                   ),
-                  title: const Text('Payments'),
+                  title: const Text('History'),
                   onTap: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => MyRideScreen(userUid: FirebaseAuth.instance.currentUser!.uid,),
                         ));
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  leading: const Icon(
+                    Icons.payment,
+                    color: Colors.black,
+                  ),
+                  title: const Text('Payments'),
+                  onTap: () {
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (context) => MyRideScreen(userUid: FirebaseAuth.instance.currentUser!.uid,),
+                    //     ));
                   },
                 ),
                 const Divider(),

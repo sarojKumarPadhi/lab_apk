@@ -179,15 +179,19 @@ class ToDayRide extends StatelessWidget {
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
                                           children: [
-                                            Text(
+                                            const Text(
                                               "Time : ",
-                                              style: const TextStyle(fontSize: 14),
+                                              style: TextStyle(fontSize: 14),
                                             ),
                                             Text(
                                               "${data['time']}",
                                               style: const TextStyle(fontSize: 14),
                                             ),
                                             const Spacer(),
+                                            Text(
+                                              "${data['rideStatus'] ?? 'No status'}",
+                                              style: const TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -351,6 +355,10 @@ class _HistoryRideState extends State<HistoryRide> {
                                                   fontSize: 14),
                                             ),
                                             const Spacer(),
+                                            Text(
+                                              "${data['rideStatus'] ?? 'No status'}",
+                                              style: const TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -381,7 +389,7 @@ class _HistoryRideState extends State<HistoryRide> {
                           );
                         },
                       )
-                          : const Center(child: Text("No Home Collenction"))));
+                    : const Center(child: Text("No Home Collenction"))));
                 }
               },
             ),
