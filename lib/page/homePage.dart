@@ -98,7 +98,7 @@ class HomePageState extends State<HomePage> {
     return Container(
       decoration: const BoxDecoration(
           image: DecorationImage(
-              image: AssetImage('assets/images/img_5.png'), fit: BoxFit.cover)),
+              image: AssetImage('assets/images/bg_image.jpg'), fit: BoxFit.cover)),
       child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(

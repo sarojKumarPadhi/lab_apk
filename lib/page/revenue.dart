@@ -189,7 +189,7 @@ class ToDayRide extends StatelessWidget {
                                             ),
                                             const Spacer(),
                                             Text(
-                                              "${data['rideStatus'] ?? 'No status'}",
+                                              "${data['rideStatus'] ?? ' '}",
                                               style: const TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
                                             ),
                                           ],
@@ -339,6 +339,26 @@ class _HistoryRideState extends State<HistoryRide> {
                                           ],
                                         ),
                                       ),
+
+                                      Padding(
+                                        padding:
+                                        const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              "Earning : ",
+                                              style: const TextStyle(
+                                                  fontSize: 14),
+                                            ),
+                                            Text(
+                                              "${data['earning']}",
+                                              style: const TextStyle(
+                                                  fontSize: 14),
+                                            ),
+                                            const Spacer(),
+                                          ],
+                                        ),
+                                      ),
                                       Padding(
                                         padding:
                                         const EdgeInsets.all(8.0),
@@ -356,28 +376,9 @@ class _HistoryRideState extends State<HistoryRide> {
                                             ),
                                             const Spacer(),
                                             Text(
-                                              "${data['rideStatus'] ?? 'No status'}",
+                                              "${data['rideStatus'] ?? ' '}",
                                               style: const TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                        const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              "Earning : ",
-                                              style: const TextStyle(
-                                                  fontSize: 14),
-                                            ),
-                                            Text(
-                                              "${data['earning']}",
-                                              style: const TextStyle(
-                                                  fontSize: 14),
-                                            ),
-                                            const Spacer(),
                                           ],
                                         ),
                                       ),
