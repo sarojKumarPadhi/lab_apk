@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
@@ -20,7 +22,7 @@ import '../global/globalData.dart';
 import '../model/patient_data_model.dart';
 
 class NewPatient1 extends StatefulWidget {
-  NewPatient1({super.key});
+  const NewPatient1({super.key});
 
   @override
   State<NewPatient1> createState() => _NewPatient1State();
@@ -119,7 +121,7 @@ class _NewPatient1State extends State<NewPatient1>
                                       onChanged: (value) {
                                         newRideController.checkUncheck(
                                             newRideController
-                                                .patientList[index].id!);
+                                                .patientList[index].id);
                                       },
                                     )),
                                 trailing: IconButton(
@@ -143,8 +145,9 @@ class _NewPatient1State extends State<NewPatient1>
                                                     Colors.transparent,
                                                 body: Center(
                                                   child: Container(
-                                                    constraints: BoxConstraints(
-                                                        maxWidth: 300),
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                            maxWidth: 300),
                                                     decoration: BoxDecoration(
                                                       color: Colors.white,
                                                       borderRadius:
@@ -162,7 +165,9 @@ class _NewPatient1State extends State<NewPatient1>
                                                         ),
                                                       ],
                                                     ),
-                                                    padding: EdgeInsets.all(16),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            16),
                                                     child: Column(
                                                       mainAxisSize:
                                                           MainAxisSize.min,
@@ -269,13 +274,13 @@ class _NewPatient1State extends State<NewPatient1>
                                   children: [
                                     Obx(() => Text(
                                           newRideController.patientList[index]
-                                                      .name!.length >
+                                                      .name.length >
                                                   15
                                               ? newRideController
-                                                  .patientList[index].name!
+                                                  .patientList[index].name
                                                   .substring(0, 15)
                                               : newRideController
-                                                  .patientList[index].name!,
+                                                  .patientList[index].name,
                                           style: TextStyle(
                                             fontSize: deviceWidth! * 0.04,
                                             fontWeight: FontWeight.bold,
@@ -510,8 +515,7 @@ class _NewPatient1State extends State<NewPatient1>
                             const SizedBox(
                               width: 5,
                             ),
-                            if (!newRideController.isRecording.value &&
-                                newRideController.audioPath.value != null)
+                            if (!newRideController.isRecording.value)
                               ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors
@@ -613,7 +617,7 @@ class _NewPatient1State extends State<NewPatient1>
                                         Text(
                                           masterListController
                                               .masterList[index].phone!,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -623,12 +627,12 @@ class _NewPatient1State extends State<NewPatient1>
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 8),
+                                    const SizedBox(height: 8),
                                     Text(
                                       sampleList.isEmpty
                                           ? "No Sample"
                                           : sampleList,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontStyle: FontStyle.italic,
                                       ),
                                     ),
@@ -702,7 +706,7 @@ class _NewPatient1State extends State<NewPatient1>
                                           true);
                                     }
                                   },
-                                  icon: Icon(Icons.more_vert),
+                                  icon: const Icon(Icons.more_vert),
                                 ),
                               );
                             },
@@ -745,9 +749,11 @@ class _NewPatient1State extends State<NewPatient1>
                       height: deviceHeight! * .065,
                       child: ElevatedButton(
                         onPressed: () {
-                          newRideController.selectedPatientsId.forEach(
-                              (element) => newRideController
-                                  .addNewPatientFromMasterList(element));
+                          for (var element
+                              in newRideController.selectedPatientsId) {
+                            newRideController
+                                .addNewPatientFromMasterList(element);
+                          }
                           priceController.price.value +=
                               (newRideController.patientList.length - 1) *
                                   ridePriceController.minimumRidePrice.value;
@@ -794,6 +800,8 @@ class _NewPatient1State extends State<NewPatient1>
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        ValidatePhoneController validatePhoneController =
+            Get.put(ValidatePhoneController());
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
@@ -861,8 +869,28 @@ class _NewPatient1State extends State<NewPatient1>
                   ),
                   keyboardType: TextInputType.phone,
                   onChanged: (value) {
-                    newRideController.patientPhoneNumber.value = value;
+                    if (phoneController.text[0] != '6' &&
+                        phoneController.text[0] != '7' &&
+                        phoneController.text[0] != '8' &&
+                        phoneController.text[0] != '9') {
+                      validatePhoneController.errorText.value =
+                          ' * Not a valid Number';
+                    } else {
+                      validatePhoneController.errorText.value = '';
+                      newRideController.patientPhoneNumber.value = value;
+                    }
                   },
+                ),
+                Obx(() {
+                  return Text(
+                    validatePhoneController.errorText.value,
+                    style: const TextStyle(
+                      color: Colors.red,
+                    ),
+                  );
+                }),
+                SizedBox(
+                  height: deviceHeight! * .01,
                 ),
                 const Text(
                   'Gender',
@@ -902,9 +930,13 @@ class _NewPatient1State extends State<NewPatient1>
             ),
             ElevatedButton(
               onPressed: () {
-                if (_formKey.currentState!.validate()) {
+                if (_formKey.currentState!.validate() &&
+                    phoneController.text.length == 10) {
                   Navigator.pop(context);
                   addTestList(context);
+                } else {
+                  validatePhoneController.errorText.value =
+                      "Please enter a valid number";
                 }
               },
               child: const Text('Next'),
@@ -934,13 +966,13 @@ class _NewPatient1State extends State<NewPatient1>
                     title:
                         Text(testMenuController.testMenuList[index].category!),
                     leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(deviceWidth!*.005),
+                      borderRadius: BorderRadius.circular(deviceWidth! * .005),
                       child: CachedNetworkImage(
                         fit: BoxFit.cover,
-                          imageUrl:
-                              testMenuController.testMenuList[index].imageUrl!,
-                        height: deviceHeight!*.04,
-                        width: deviceWidth!*.08,
+                        imageUrl:
+                            testMenuController.testMenuList[index].imageUrl!,
+                        height: deviceHeight! * .04,
+                        width: deviceWidth! * .08,
                         errorWidget: (context, url, error) {
                           return const Icon(Icons.error);
                         },
@@ -949,10 +981,9 @@ class _NewPatient1State extends State<NewPatient1>
                               baseColor: Colors.white10,
                               highlightColor: Colors.black26,
                               child: SizedBox(
-                                height: deviceHeight!*.03,
-                                width: deviceWidth!*.05,
-                              )
-                          );
+                                height: deviceHeight! * .03,
+                                width: deviceWidth! * .05,
+                              ));
                         },
                       ),
                     ),
@@ -967,7 +998,7 @@ class _NewPatient1State extends State<NewPatient1>
                 Navigator.of(context).pop();
                 addBasicDetails(context);
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1012,4 +1043,8 @@ class _NewPatient1State extends State<NewPatient1>
             ))
         .toList();
   }
+}
+
+class ValidatePhoneController extends GetxController {
+  RxString errorText = ''.obs;
 }
