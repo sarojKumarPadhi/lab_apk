@@ -17,7 +17,7 @@ verifyOtp(BuildContext context, String otpByInput) async {
       colorText: Colors.white,
       icon: const Icon(Icons.dangerous, color: Colors.white),
       "Alert",
-      "Enter a Valid Otp",
+      "Enter a Valid Otp ",
       backgroundColor: Colors.red,
     );
   }

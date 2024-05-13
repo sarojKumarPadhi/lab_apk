@@ -1,6 +1,8 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:jonk_lab/component/myTextField.dart';
@@ -25,18 +27,69 @@ class _UserRegistrationState extends State<UserRegistration> {
   TextEditingController labRegistrationController = TextEditingController();
   TextEditingController labOwnerNameController = TextEditingController();
   TernAndConditionsController ternAndConditionsController =
-  Get.put(TernAndConditionsController());
+      Get.put(TernAndConditionsController());
   GetStorage data = GetStorage();
 
   @override
   initState() {
     super.initState();
+    Future.delayed(Duration.zero, () {
+      _showProminentDisclosure();
+    });
+
     if (data.read("basicDetails") != null) {
       Map<String, dynamic> getData = data.read("basicDetails");
       labNameController.text = getData["labName"];
       labRegistrationController.text = getData["labRegistrationNumber"];
       labOwnerNameController.text = getData["labOwnerName"];
     }
+  }
+
+  void _showProminentDisclosure() {
+    showDialog(
+      context: context,
+      barrierDismissible:
+          false, // Dialog cannot be dismissed by tapping outside
+      builder: (context) => AlertDialog(
+        title: const Text('Location Access'),
+        content: const SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'This app collects location data to enable:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text('1. To Track the location of rider'),
+              Text('2. To calculate distance between rider and lab app'),
+              Text(
+                  "3. To determine the presence of the rider in the vicinity of the lab's location."),
+              SizedBox(height: 8),
+              SizedBox(height: 16),
+              Text(
+                'This location data is collected even when the app is closed or not in use.',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Close the dialog
+              Get.to(const UserRegistration());
+            },
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    ).then((value) {
+      // If the dialog is dismissed without pressing "Continue", exit the app
+      if (!value) {
+        SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+      }
+    });
   }
 
   storeData() {
@@ -50,14 +103,9 @@ class _UserRegistrationState extends State<UserRegistration> {
 
   @override
   Widget build(BuildContext context) {
-    deviceWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    deviceHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    deviceWidth = MediaQuery.of(context).size.width;
+    deviceHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
@@ -133,16 +181,15 @@ class _UserRegistrationState extends State<UserRegistration> {
                 child: SizedBox(
                     width: deviceWidth! - 50,
                     height: deviceHeight! * .06,
-                    child: Obx(() =>
-                        ElevatedButton(
+                    child: Obx(() => ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
                               if (ternAndConditionsController.isChecked.value) {
                                 showDialog(
                                   context: context,
                                   barrierDismissible: false,
-                                  builder: (
-                                      context) => const CircularProgress(),
+                                  builder: (context) =>
+                                      const CircularProgress(),
                                 );
                                 registrationPercentage = 0.30;
 
@@ -150,20 +197,22 @@ class _UserRegistrationState extends State<UserRegistration> {
                                 storeData();
                                 Future.delayed(
                                   const Duration(milliseconds: 2000),
-                                      () {
+                                  () {
                                     Get.to(() => const UserRegistration1(),
-                                        duration:
-                                        const Duration(milliseconds: 400),
-                                        transition: Transition.circularReveal)
+                                            duration: const Duration(
+                                                milliseconds: 400),
+                                            transition:
+                                                Transition.circularReveal)
                                         ?.then((value) {
                                       Navigator.pop(context);
                                     });
                                   },
                                 );
-                              }
-                              else {
+                              } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Please Accept Terms & Conditions")));
+                                    const SnackBar(
+                                        content: Text(
+                                            "Please Accept Terms & Conditions")));
                               }
                             }
                           },
@@ -188,26 +237,25 @@ class _UserRegistrationState extends State<UserRegistration> {
                 duration: const Duration(milliseconds: 3000),
                 child: Row(
                   children: [
-                    Obx(() =>
-                        Checkbox(
+                    Obx(() => Checkbox(
                           checkColor: Colors.blue,
                           activeColor: Colors.black,
                           value: ternAndConditionsController.isChecked.value,
                           onChanged: (bool? value) {
                             setState(() {
                               ternAndConditionsController.isChecked.value =
-                              value!;
+                                  value!;
                             });
                           },
                         )),
                     RichText(
                       text: TextSpan(
                         text: 'Accept our terms of services & ',
-                        style: TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.black),
                         children: <TextSpan>[
                           TextSpan(
                             text: 'privacy policy.',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.blue,
                               decoration: TextDecoration.underline,
                             ),
@@ -241,3 +289,56 @@ class _UserRegistrationState extends State<UserRegistration> {
 class TernAndConditionsController extends GetxController {
   RxBool isChecked = false.obs;
 }
+
+
+
+    // showDialog(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    //       return AlertDialog(
+    //         title: const Text('Location Access'),
+    //         content: const SingleChildScrollView(
+    //           child: Column(
+    //             crossAxisAlignment: CrossAxisAlignment.start,
+    //             children: [
+    //               Text(
+    //                 'This app collects location data to enable:',
+    //                 style: TextStyle(fontWeight: FontWeight.bold),
+    //               ),
+    //               SizedBox(height: 8),
+    //               Text('Feature 1'),
+    //               Text('Feature 2'),
+    //               Text('Feature 3'),
+    //               SizedBox(height: 8),
+    //               Text(
+    //                 'This data is also used to provide ads/support advertising/support ads.',
+    //                 style: TextStyle(fontStyle: FontStyle.italic),
+    //               ),
+    //               SizedBox(height: 16),
+    //               Text(
+    //                 'This location data is collected even when the app is closed or not in use.',
+    //                 style: TextStyle(fontWeight: FontWeight.bold),
+    //               ),
+    //             ],
+    //           ),
+    //         ),
+    //         actions: <Widget>[
+    //           TextButton(
+    //             onPressed: () {
+    //               Navigator.pop(context); // Close the dialog
+    //               // Continue app initialization
+    //             },
+    //             child: const Text('Accept'),
+    //           ),
+    //           TextButton(
+    //             onPressed: () {
+    //               Navigator.pop(context); // Close the dialog
+    //               // Handle denial of location access
+    //             },
+    //             child: const Text('Deny'),
+    //           ),
+    //         ],
+    //       );
+    //     },
+    //   );
+    

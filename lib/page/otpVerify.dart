@@ -6,7 +6,6 @@ import 'package:jonk_lab/global/globalData.dart';
 import 'package:jonk_lab/page/mobileNumber.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/style.dart';
-import 'package:pinput/pinput.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import 'package:telephony/telephony.dart';
 
@@ -25,9 +24,9 @@ class OtpVerify extends StatefulWidget {
 class OtpVerifyState extends State<OtpVerify> {
   final _formKey = GlobalKey<FormState>();
 
-  String otpVariable='';
+  String otpVariable = '';
   Telephony telephony = Telephony.instance;
- final OtpFieldController otpBoxController = OtpFieldController();
+  final OtpFieldController otpBoxController = OtpFieldController();
 
   @override
   initState() {
@@ -57,12 +56,10 @@ class OtpVerifyState extends State<OtpVerify> {
 
         String sms = message.body.toString();
         if (message.body!.contains('verification')) {
-
-          String otpcode = sms.replaceAll(new RegExp(r'[^0-9]'), '');
+          String otpcode = sms.replaceAll(RegExp(r'[^0-9]'), '');
           otpBoxController.set(otpcode.split(""));
 
-          setState(() {
-          });
+          setState(() {});
         } else {
           print("error");
         }
@@ -70,7 +67,6 @@ class OtpVerifyState extends State<OtpVerify> {
       listenInBackground: false,
     );
   }
-
 
   snackBar() {
     Get.snackbar(
@@ -157,19 +153,20 @@ class OtpVerifyState extends State<OtpVerify> {
                   duration: const Duration(milliseconds: 3000),
                   child: Padding(
                     padding: EdgeInsets.only(
-                        right: deviceWidth! * 0.027, left: deviceWidth! * 0.027),
+                        right: deviceWidth! * 0.027,
+                        left: deviceWidth! * 0.027),
                     child: OTPTextField(
                       outlineBorderRadius: 10,
                       controller: otpBoxController,
                       length: 6,
                       width: MediaQuery.of(context).size.width,
                       fieldWidth: 50,
-                      style: TextStyle(fontSize: 17),
+                      style: const TextStyle(fontSize: 17),
                       textFieldAlignment: MainAxisAlignment.spaceAround,
                       fieldStyle: FieldStyle.box,
                       onChanged: (value) {
-                        if (value.length==6){
-                          otpVariable=value;
+                        if (value.length == 6) {
+                          otpVariable = value;
                         }
                       },
                       onCompleted: (pin) {
@@ -180,13 +177,10 @@ class OtpVerifyState extends State<OtpVerify> {
                             return const CircularProgress();
                           },
                         );
-                        if(pin.length==6){
-                          verifyOtp(context,pin);
+                        if (pin.length == 6) {
+                          verifyOtp(context, pin);
                         }
-
                       },
-
-
                     ),
                   ),
                 ),
@@ -231,8 +225,7 @@ class OtpVerifyState extends State<OtpVerify> {
                         Future.delayed(
                           const Duration(milliseconds: 2000),
                           () {
-
-                            verifyOtp(context,otpVariable);
+                            verifyOtp(context, otpVariable);
                           },
                         );
                       }

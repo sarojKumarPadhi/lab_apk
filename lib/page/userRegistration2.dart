@@ -207,9 +207,9 @@ class _UserRegistration2State extends State<UserRegistration2> {
                         return AlertDialog(
                           shape: RoundedRectangleBorder(
                               borderRadius:
-                                  BorderRadius.circular(deviceWidth! * .02)),
-                          title: Text("Location Confirmation"),
-                          content: Text(
+                                  BorderRadius.circular(deviceWidth * .02)),
+                          title: const Text("Location Confirmation"),
+                          content: const Text(
                               "Make Sure Now you are on your lab Location"),
                           actions: [
                             TextButton(
@@ -219,13 +219,13 @@ class _UserRegistration2State extends State<UserRegistration2> {
                                 // Add your confirmation logic here
                                 showSetLocationDialog();
                               },
-                              child: Text("Confirm"),
+                              child: const Text("Confirm"),
                             ),
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
-                              child: Text("Cancel"),
+                              child: const Text("Cancel"),
                             ),
                           ],
                         );
@@ -365,13 +365,13 @@ class _UserRegistration2State extends State<UserRegistration2> {
                       Fluttertoast.showToast(msg: "Enter all fields");
                     }
                   },
-                  child: Text("Confirm"),
+                  child: const Text("Confirm"),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text("Cancel"),
+                  child: const Text("Cancel"),
                 ),
               ],
             );

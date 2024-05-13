@@ -87,7 +87,7 @@ dependencies:
   connectivity_plus: ^5.0.2
   carousel_slider: ^4.2.1
   flutter_custom_selector: ^0.0.3
-  permission_handler: ^11.3.0
+  permission_handler: ^11.3.1
   flutter_animated_button: ^2.0.3
   flutter_geofire: ^2.0.3
   mailer: ^6.1.0
@@ -99,6 +99,7 @@ dependencies:
   telephony: ^0.2.0
   dropdown_search: ^5.0.6
   flutter_launcher_icons: ^0.13.1
+  logger: ^2.2.0
 
 ## google map related packages
 google_maps_flutter: ^2.5.2

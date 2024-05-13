@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
@@ -636,11 +634,12 @@ class _NewPatient1State extends State<NewPatient1>
                                         fontStyle: FontStyle.italic,
                                       ),
                                     ),
-                                  ],
+                                  ], //ic_launcher
                                 ),
                                 leading: Obx(
                                   () => Checkbox(
-                                    value: newRideController.selectedPatientsId
+                                    value: newRideController
+                                        .selectedPatientsId // ic_launcher.png
                                         .contains(masterListController
                                             .masterList[index].id!),
                                     onChanged: (value) {
@@ -686,18 +685,6 @@ class _NewPatient1State extends State<NewPatient1>
                                       newRideController.gender.value =
                                           masterListController
                                               .masterList[index].gender!;
-                                      // MasterList masterList = MasterList();
-                                      // masterList.addNameAge(
-                                      //     context,
-                                      //     masterListController
-                                      //         .masterList[index].name!,
-                                      //     masterListController
-                                      //         .masterList[index].age!,
-                                      //     masterListController
-                                      //         .masterList[index].phone!,
-                                      //     index,
-                                      //     masterListController
-                                      //         .masterList[index].samples!);
                                     } else if (value == 'Delete') {
                                       masterListController.deleteFromMasterList(
                                           masterListController

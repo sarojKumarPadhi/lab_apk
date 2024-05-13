@@ -14,7 +14,6 @@ import 'package:jonk_lab/global/logout.dart';
 import 'package:jonk_lab/page/revenue.dart';
 import 'package:jonk_lab/page/track_sample.dart';
 import 'package:lottie/lottie.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../controller/get_profile_controller.dart';
 import '../controller/lab_basic_details.dart';
 import '../controller/test_menu_controller.dart';
@@ -22,7 +21,6 @@ import '../controller/update_profile_controller.dart';
 import '../drawer_item/Support.dart';
 import '../drawer_item/master_list.dart';
 import '../service/push_notification_service.dart';
-import '../services/email_service.dart';
 import 'new_patient.dart';
 
 class HomePage extends StatefulWidget {
@@ -50,11 +48,12 @@ class HomePageState extends State<HomePage> {
     print("this is device token : $deviceToken");
     updateDeviceToken(deviceToken!);
   }
+
   @override
   void initState() {
     print(getProfileImageController.profileUrl.value);
     super.initState();
-    requestSmsPermission();
+    // requestSmsPermission();
     newDeviceToken();
     PushNotificationService().initializeCloudMessaging(context);
     PushNotificationService().requestNotificationPermissions();
@@ -72,23 +71,20 @@ class HomePageState extends State<HomePage> {
     return false;
   }
 
-
-
-
-  Future<void> requestSmsPermission() async {
-    if (await Permission.sms.request().isGranted) {
-      // Permission is already granted, proceed with sending SMS
-      // sendSms("8210109466", "2345678");
-    } else {
-      // Permission has not been granted yet. Request it.
-      if (await Permission.sms.request().isGranted) {
-        // sendSms();
-      } else {
-        // Permission denied. Show an error message or handle it gracefully.
-        print('SMS permission denied');
-      }
-    }
-  }
+  // Future<void> requestSmsPermission() async {
+  //   if (await Permission.sms.request().isGranted) {
+  //     // Permission is already granted, proceed with sending SMS
+  //     // sendSms("8210109466", "2345678");
+  //   } else {
+  //     // Permission has not been granted yet. Request it.
+  //     if (await Permission.sms.request().isGranted) {
+  //       // sendSms();
+  //     } else {
+  //       // Permission denied. Show an error message or handle it gracefully.
+  //       print('SMS permission denied');
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +94,8 @@ class HomePageState extends State<HomePage> {
     return Container(
       decoration: const BoxDecoration(
           image: DecorationImage(
-              image: AssetImage('assets/images/bg_image.jpg'), fit: BoxFit.cover)),
+              image: AssetImage('assets/images/bg_image.jpg'),
+              fit: BoxFit.cover)),
       child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
@@ -155,7 +152,7 @@ class HomePageState extends State<HomePage> {
                                 color: Colors.grey.withOpacity(0.5),
                                 spreadRadius: 2,
                                 blurRadius: 5,
-                                offset: Offset(0, 3),
+                                offset: const Offset(0, 3),
                               ),
                             ],
                           ),
@@ -173,7 +170,7 @@ class HomePageState extends State<HomePage> {
                                   color: Colors.black87,
                                 ),
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Row(
                                 children: [
                                   Icon(
@@ -190,7 +187,7 @@ class HomePageState extends State<HomePage> {
                                         ? Colors.green
                                         : Colors.red,
                                   ),
-                                  SizedBox(width: 5),
+                                  const SizedBox(width: 5),
                                   Text(
                                     labBasicDetailsController
                                             .labBasicDetailsData
@@ -221,12 +218,12 @@ class HomePageState extends State<HomePage> {
                               updateProfileController.updateProfile();
                             },
                             child: Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
+                              padding: const EdgeInsets.all(10),
+                              decoration: const BoxDecoration(
                                 color: Colors.blue,
                                 shape: BoxShape.circle,
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.edit,
                                 color: Colors.white,
                               ),
@@ -277,7 +274,9 @@ class HomePageState extends State<HomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MyRideScreen(userUid: FirebaseAuth.instance.currentUser!.uid,),
+                          builder: (context) => MyRideScreen(
+                            userUid: FirebaseAuth.instance.currentUser!.uid,
+                          ),
                         ));
                   },
                 ),
@@ -477,7 +476,7 @@ class HomePageState extends State<HomePage> {
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
-                                          backgroundColor: Colors.red,
+                                            backgroundColor: Colors.red,
                                             content: Text(
                                                 "Your account is not verified")));
                                   }
@@ -507,21 +506,23 @@ class HomePageState extends State<HomePage> {
                                       Padding(
                                         padding: const EdgeInsets.only(left: 8),
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               "Track",
                                               style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: deviceWidth!*.05,
+                                                  fontSize: deviceWidth! * .05,
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Text(
                                               "PHLEBOTOMISTS",
                                               style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: deviceWidth!*.04,
+                                                  fontSize: deviceWidth! * .04,
                                                   fontWeight: FontWeight.bold),
                                             ),
                                           ],
@@ -599,7 +600,6 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-
   Future updateDeviceToken(String value) async {
     try {
       String uId = FirebaseAuth.instance.currentUser!.uid;
@@ -613,5 +613,4 @@ class HomePageState extends State<HomePage> {
           backgroundColor: Colors.red, colorText: Colors.white);
     }
   }
-
 }

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jonk_lab/global/globalData.dart';
+import 'package:logger/logger.dart';
 
 import '../page/otpVerify.dart';
 
@@ -11,9 +12,10 @@ sendOtp(BuildContext context) async {
       phoneNumber: '+91$phoneNumber',
       verificationCompleted: (PhoneAuthCredential credential) {},
       verificationFailed: (FirebaseAuthException e) {
+        Logger().d(e);
         Navigator.pop(context);
         Get.snackbar(
-          "SMS verification code request failed",
+          "SMS verification code request failed $e",
           colorText: Colors.white,
           "Enter a valid number",
           snackPosition: SnackPosition.TOP,
@@ -24,11 +26,11 @@ sendOtp(BuildContext context) async {
         verificationToken = verificationId;
 
         Get.to(() => const OtpVerify(),
-            duration: const Duration(milliseconds: 300),
-            transition: Transition.leftToRight)?.then((value){
-              Navigator.pop(context);
+                duration: const Duration(milliseconds: 300),
+                transition: Transition.leftToRight)
+            ?.then((value) {
+          Navigator.pop(context);
         });
-
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
     );
@@ -36,8 +38,9 @@ sendOtp(BuildContext context) async {
     Get.snackbar(
       "OTP sent failed ",
       colorText: Colors.white,
-      "Enter a valid number",
+      "Enter a valid number ",
       snackPosition: SnackPosition.TOP,
       backgroundColor: Colors.redAccent,
-    );  }
+    );
+  }
 }
