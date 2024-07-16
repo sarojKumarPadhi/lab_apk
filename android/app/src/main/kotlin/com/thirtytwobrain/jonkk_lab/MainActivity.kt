@@ -1,4 +1,4 @@
-package com.geteideas.jonk_lab
+package com.thirtytwobrain.jonkk_lab
 
 import io.flutter.embedding.android.FlutterActivity
 

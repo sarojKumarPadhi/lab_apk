@@ -8,6 +8,7 @@ import 'package:jonk_lab/global/color.dart';
 import 'package:jonk_lab/page/userRegistration3.dart';
 
 import '../controller/registration_lab_location_controller.dart';
+import '../global/const.dart';
 import '../global/globalData.dart';
 import '../model/predected_place.dart';
 import '../permission_handler/device_location_permission.dart';
@@ -98,7 +99,7 @@ class _UserRegistration2State extends State<UserRegistration2> {
                 key: _formKey,
                 child: TextFormField(
                   onChanged: (value) async {
-                    String mapKey = "AIzaSyCudnOm2h7hs1412HqGRn58uFpLn6Pdw18";
+                    // String mapKey = "AIzaSyCudnOm2h7hs1412HqGRn58uFpLn6Pdw18";
                     String apiUrl =
                         "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$value&key=$mapKey&components=country:IN";
                     var result = await apiRequest(apiUrl);
@@ -170,7 +171,7 @@ class _UserRegistration2State extends State<UserRegistration2> {
                                 selectedLabLocationController.text =
                                     "${predictedList[index].main_text!} ${predictedList[index].secondary_id!}";
                                 String apiUrl =
-                                    "https://maps.googleapis.com/maps/api/place/details/json?&place_id=${predictedList[index].place_id!}&key=AIzaSyCudnOm2h7hs1412HqGRn58uFpLn6Pdw18";
+                                    "https://maps.googleapis.com/maps/api/place/details/json?&place_id=${predictedList[index].place_id!}&key=$mapKey";
                                 var response = await apiRequest(apiUrl);
                                 if (response != "response error") {
                                   latitude = response["result"]["geometry"]
@@ -290,7 +291,7 @@ class _UserRegistration2State extends State<UserRegistration2> {
                     maxLines: 3,
                     decoration: InputDecoration(
                       hintText:
-                          "SCO 801, NAC Manimajra, Sector 13, Chandigarh, Panchkula, Chandigarh 160101",
+                          "Eg - SCO 801, NAC Manimajra, Sector 13, Chandigarh, Panchkula, Chandigarh 160101",
                       hintStyle: TextStyle(fontSize: deviceWidth! * .04),
                       enabledBorder: const OutlineInputBorder(),
                       focusedBorder: const OutlineInputBorder(),

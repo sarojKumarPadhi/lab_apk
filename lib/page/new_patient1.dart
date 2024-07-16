@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jonk_lab/page/search_rider_page.dart';
 import 'package:shimmer/shimmer.dart';
-
 import '../controller/lab_basic_details.dart';
 import '../controller/master_list_controller.dart';
 import '../controller/new_ride_controller.dart';

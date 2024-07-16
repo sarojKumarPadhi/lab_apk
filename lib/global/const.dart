@@ -1,1 +1,2 @@
-String mapKey="AIzaSyCudnOm2h7hs1412HqGRn58uFpLn6Pdw18";
+String mapKey="AIzaSyANKaxu6P55GWGrcAscyS2Of78tEuFHbI0";
+String geocodingApi="AIzaSyD0sdwAufvXFUyDpG_bVLmEvdJdE1UYNGU";

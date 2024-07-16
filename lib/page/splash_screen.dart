@@ -18,12 +18,9 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
-
-
   getDeviceToken() async {
-    FirebaseMessaging messaging=FirebaseMessaging.instance;
-    String? deviceToken=await messaging.getToken();
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    String? deviceToken = await messaging.getToken();
     print(deviceToken);
   }
 

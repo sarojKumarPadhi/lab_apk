@@ -9,6 +9,7 @@ import '../controller/lab_basic_details.dart';
 import '../controller/new_ride_controller.dart';
 import '../controller/ride_price_controller.dart';
 import '../controller/rider_price_controller.dart';
+import '../global/const.dart';
 import '../model/direction_detail_info.dart';
 import '../model/predected_place.dart';
 import '../services/networkRequest.dart';
@@ -42,7 +43,7 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
             TextFormField(
               onChanged: (value) async {
                 if (value.isNotEmpty) {
-                  String mapKey = "AIzaSyCudnOm2h7hs1412HqGRn58uFpLn6Pdw18";
+
                   String? location =
                       "${labBasicDetailsController.labBasicDetailsData.value.address?.geoPoint.latitude.toString()},${labBasicDetailsController.labBasicDetailsData.value.address?.geoPoint.longitude.toString()}"; // Latitude and longitude of Delhi (you can use any location within Delhi)
                   int radiusInMeters = 20000;
@@ -77,10 +78,9 @@ class _PatientLocationPageState extends State<PatientLocationPage> {
                           newRideController.patientLocation.value =
                               predictedList[index].main_text! +
                                   predictedList[index].secondary_id!;
-                          String mapUrl =
-                              "AIzaSyCudnOm2h7hs1412HqGRn58uFpLn6Pdw18";
+
                           String apiUrl =
-                              "https://maps.googleapis.com/maps/api/place/details/json?place_id=${predictedList[index].place_id!}&key=$mapUrl";
+                              "https://maps.googleapis.com/maps/api/place/details/json?place_id=${predictedList[index].place_id!}&key=$mapKey";
                           LatLng? result = await apiRequestForLatLng(apiUrl);
                           newRideController.patientLatLng =
                               LatLng(result!.latitude, result.longitude);

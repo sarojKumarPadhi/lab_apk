@@ -43,6 +43,44 @@
           "other_platform_oauth_client": []
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:462532468234:android:e939271ddad63f13d4c9f3",
+        "android_client_info": {
+          "package_name": "com.thirtytwobrain.jonkk_lab"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaZWnJ0KrnuL_ile3HbJwrtD_zspXj0Lw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:462532468234:android:dd6213618dc87368d4c9f3",
+        "android_client_info": {
+          "package_name": "com.thirtytwobrain.jonkk_rider"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaZWnJ0KrnuL_ile3HbJwrtD_zspXj0Lw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
     }
   ],
   "configuration_version": "1"
